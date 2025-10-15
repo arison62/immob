@@ -292,7 +292,8 @@ export default function Dashboard({ user, stats }) {
 ```
 frontend/
 ├── css/
-│   └── app.css                # Styles Tailwind principaux
+│   └── main.css                # Styles Generer
+│   └── tailwind.css            # Styles Tailwind principaux
 └── js/
     ├── main.jsx               # Point d'entrée Inertia/React
     ├── pages/                 # Pages Inertia (routes)
