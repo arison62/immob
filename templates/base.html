@@ -1,19 +1,55 @@
 {% load django_vite %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="csrf-token" content="" />
-        {% vite_hmr_client %}
-        
-        {% vite_react_refresh %}
-        {% vite_asset 'js/main.jsx' %}
-        
-        <title>Django Inertia</title>
-    </head>
-    <body>
-        {% block inertia %}{% endblock %}
-    </body>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Immob - Application moderne de gestion de patrimoine immobilier meublé. Gérez vos biens, contrats et locataires en toute simplicité." />
+    <meta name="keywords" content="gestion immobilière, patrimoine immobilier, location meublée, gestion locative, immobilier" />
+    <meta name="author" content="Immob Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:title" content="Immob - Gestion de Patrimoine Immobilier" />
+    <meta property="og:description" content="Application moderne de gestion de patrimoine immobilier meublé. Gérez vos biens, contrats et locataires en toute simplicité." />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-image.jpg' %}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Immob" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="{{ request.build_absolute_uri }}" />
+    <meta name="twitter:title" content="Immob - Gestion de Patrimoine Immobilier" />
+    <meta name="twitter:description" content="Application moderne de gestion de patrimoine immobilier meublé. Gérez vos biens, contrats et locataires en toute simplicité." />
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/twitter-card.jpg' %}" />
+    <meta name="twitter:creator" content="@immob" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+    
+    <!-- Vite Assets -->
+    {% vite_hmr_client %}
+    {% vite_react_refresh %}
+    {% vite_asset 'js/main.jsx' %}
+    
+    <title>{% block title %}Immob - Gestion de Patrimoine Immobilier{% endblock %}</title>
+</head>
+<body>
+    {% block inertia %}{% endblock %}
+</body>
 </html>
