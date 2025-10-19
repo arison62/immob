@@ -36,17 +36,17 @@ export default function Index() {
     },
     {
       name: "FOTSO PONE Albert Le Grand",
-      github: "arsion62",
-      linkedin: "",
+      github: "arison62",
+      linkedin: "https://www.linkedin.com/in/albert-fotso-74a763238/",
     },
     {
       name: "Doubla Senguel",
       github: "",
-      linkedin: "",
+      linkedin: "https://www.linkedin.com/in/senguel-doubla-8b42582b5/",
     },
     {
       name: "TSAGUE Bryan",
-      github: "",
+      github: "Tsague-Bryan",
       linkedin: "",
     },
     {
@@ -317,10 +317,16 @@ export default function Index() {
                     IT Security / Enseignante-chercheur, Women Sciences and
                     Technologies, STE
                   </p>
-                  <Button variant="outline" size="sm" className="mt-2">
-                    <Linkedin className="w-4 h-4 mr-2" />
-                    Profil LinkedIn
-                  </Button>
+                  <a
+                    href="https://www.linkedin.com/in/dr-boudjou-hortense-3593ba299/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="mt-2">
+                      <Linkedin className="w-4 h-4 mr-2" />
+                      Profil LinkedIn
+                    </Button>
+                  </a>
                 </div>
               </div>
             </CardContent>
