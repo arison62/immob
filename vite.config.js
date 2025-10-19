@@ -14,6 +14,7 @@ export default defineConfig((mode) => {
 	const OUTPUT_DIR = "./frontend/dist";
 
 	return {
+		
 		plugins: [
 	        tailwindcss(),
 			react()
@@ -30,6 +31,7 @@ export default defineConfig((mode) => {
 		base: "/static/",
 		server: {
 			host: "0.0.0.0",
+			cors: true,
 			port: env.DJANGO_VITE_DEV_SERVER_PORT || 5173,
 			watch: {
 				usePolling: true,

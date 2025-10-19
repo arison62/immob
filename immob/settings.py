@@ -47,8 +47,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    
     "django_vite",
     "inertia",
+
+    "core",
+    "accounts",
+    "holdings",
+    "finance",
+    "audit"
     
 ]
 
@@ -56,12 +63,12 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    
     "inertia.middleware.InertiaMiddleware",
     "immob.middleware.DataShareMiddleware",
 ]
@@ -132,6 +139,8 @@ AUTHENTICATION_BACKENDS = [
     
 ]
 
+AUTH_USER_MODEL = 'accounts.ImmobUser'
+
 LOGIN_REDIRECT_URL = "/"
 
 
@@ -159,7 +168,7 @@ STATIC_ROOT = BASE_DIR / "static"
 DJANGO_VITE = {
     "default": {
         "dev_mode": DEBUG,
-        "dev_server_host": env.str("DJANGO_VITE_DEV_SERVER_HOST", default="localhost"),
+        "dev_server_host": env.str("DJANGO_VITE_DEV_SERVER_HOST", default="192.168.8.100"),
         "dev_server_port": env.int("DJANGO_VITE_DEV_SERVER_PORT", default=5173),
     }
 }
@@ -185,3 +194,5 @@ def immutable_file_test(path, url):
     return re.match(r"^.+[.-][0-9a-zA-Z_-]{8,12}\..+$", url)
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
+
+
