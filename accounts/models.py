@@ -30,7 +30,8 @@ class ImmobUser(SoftDeletedModelMixin, ImmobBaseModel, AbstractUser):
         default=UserRole.OWNER,
         db_index=True
     )
-  
+    failed_login_attempts = models.PositiveIntegerField(default=0, verbose_name=_('Failed login attempts'))
+    last_failed_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Last failed login'))
     created_by = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,

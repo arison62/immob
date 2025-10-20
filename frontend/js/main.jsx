@@ -4,10 +4,11 @@ import axios from "axios";
 import React from 'react';
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from '@inertiajs/react';
-import Layout from './components/Layout';
+import Layout from '@/components/Layout';
 
 
 import "../css/main.css";
+import { Toaster } from "./components/ui/sonner";
 
 
 const pages = import.meta.glob("./pages/**/*.jsx");
@@ -24,7 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return page
     },
     setup({ el, App, props }) {
-		createRoot(el).render(<App {...props} />);
+		createRoot(el).render(
+      <>
+        <App {...props} />
+        <Toaster />
+      </>
+    );
 	},
   });
   

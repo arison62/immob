@@ -134,11 +134,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    "accounts.auth_backends.LockoutAuthBackend",
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
     
 ]
-
+MAX_FAILED_LOGIN_ATTEMPTS = 5
 AUTH_USER_MODEL = 'accounts.ImmobUser'
 
 LOGIN_REDIRECT_URL = "/"

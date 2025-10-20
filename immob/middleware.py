@@ -17,7 +17,6 @@ class DataShareMiddleware(object):
                 "level_tag": message.level_tag,
             }
             messages.append(message)
-
         share(request, messages=messages)
 
         response = self.get_response(request)

@@ -25,6 +25,8 @@ import {
   X,
 } from "lucide-react";
 
+import { Link } from "@inertiajs/react";
+
 export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -169,9 +171,12 @@ export default function Index() {
               </button>
               <Separator orientation="vertical" className="h-6" />
               <Button variant="ghost" size="sm">
-                Login
+                <Link href="accounts/login/">Login</Link>
               </Button>
-              <Button size="sm">Dashboard</Button>
+
+              <Button size="sm">
+                <Link href="dashboard/">Dashboard</Link>
+              </Button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -210,10 +215,10 @@ export default function Index() {
               </button>
               <div className="px-4 pt-2 space-y-2">
                 <Button variant="ghost" size="sm" className="w-full">
-                  Login
+                  <Link href="accounts/login/">Login</Link>
                 </Button>
                 <Button size="sm" className="w-full">
-                  Dashboard
+                  <Link href="dashboard/">Dashboard</Link>
                 </Button>
               </div>
             </div>
@@ -668,10 +673,10 @@ export default function Index() {
             </p>
             <div className="flex gap-2">
               <Button variant="ghost" size="sm">
-                Login
+                <Link href="accounts/login/">Login</Link>
               </Button>
               <Button variant="ghost" size="sm">
-                Dashboard
+                <Link href="dashboard/">Dashboard</Link>
               </Button>
             </div>
           </div>
