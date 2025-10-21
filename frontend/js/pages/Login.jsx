@@ -2,8 +2,21 @@ import { LoginForm } from "@/components/login-form";
 import { Building2 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import Ballpit from "@/components/Ballpit";
+import { useEffect } from React;
 
 export default function Login() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(()=>{
+  	handleResize = () =>{
+  	     setIsDesktop(window.innerWidth > 1024);
+  	}
+  	
+  	window.addEventListener('resize', handleResize);
+	return () => {
+		window.removeEventListener('resize', handleResize);
+	}  	
+  }, [])
+  
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -20,14 +33,14 @@ export default function Login() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <Ballpit
+        { isDesktop && (<Ballpit
           count={200}
           gravity={0.4}
           friction={0.9975}
           wallBounce={0.95}
           followCursor={true}
           colors={[14186819, 10186819, 1805]}
-        />
+        />)}
       </div>
     </div>
   );
