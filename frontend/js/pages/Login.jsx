@@ -2,7 +2,7 @@ import { LoginForm } from "@/components/login-form";
 import { Building2 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import Ballpit from "@/components/Ballpit";
-import { useEffect } from React;
+import { useEffect } from 'react';
 
 export default function Login() {
   const [isDesktop, setIsDesktop] = useState(false);
