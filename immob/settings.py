@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "inertia.middleware.InertiaMiddleware",
     "immob.middleware.DataShareMiddleware",
+    "immob.middleware.UserAuthMiddleware",
 ]
 
 ROOT_URLCONF = "immob.urls"
@@ -140,6 +141,7 @@ AUTHENTICATION_BACKENDS = [
     
 ]
 MAX_FAILED_LOGIN_ATTEMPTS = 5
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 AUTH_USER_MODEL = 'accounts.ImmobUser'
 
 LOGIN_REDIRECT_URL = "/"

@@ -5,7 +5,6 @@ import { useEffect } from "react";
 const Layout = ({ children }) => {
   const { messages } = usePage().props;
   useEffect(() => {
-    console.log("Layout", messages)
     messages.map((msg)=>{
       switch (msg.level_tag) {
         case "success":

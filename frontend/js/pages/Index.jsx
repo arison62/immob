@@ -26,10 +26,12 @@ import {
 } from "lucide-react";
 
 import { Link } from "@inertiajs/react";
+import { useAuth } from "@/AuthContext";
 
 export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const { isAuthenticated } = useAuth();
+  
   const teamMembers = [
     {
       name: "MANGO NGONO Honorine Jessica",
@@ -170,9 +172,11 @@ export default function Index() {
                 Technologies
               </button>
               <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="sm">
-                <Link href="accounts/login/">Login</Link>
-              </Button>
+              {!isAuthenticated && (
+                <Button variant="ghost" size="sm">
+                  <Link href="accounts/login/">Login</Link>
+                </Button>
+              )}
 
               <Button size="sm">
                 <Link href="dashboard/">Dashboard</Link>
@@ -214,9 +218,12 @@ export default function Index() {
                 Technologies
               </button>
               <div className="px-4 pt-2 space-y-2">
-                <Button variant="ghost" size="sm" className="w-full">
-                  <Link href="accounts/login/">Login</Link>
-                </Button>
+                {!isAuthenticated && (
+                  <Button variant="ghost" size="sm" className="w-full">
+                    <Link href="accounts/login/">Login</Link>
+                  </Button>
+                )}
+
                 <Button size="sm" className="w-full">
                   <Link href="dashboard/">Dashboard</Link>
                 </Button>
@@ -672,9 +679,11 @@ export default function Index() {
               Polytechnique de Maroua
             </p>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm">
-                <Link href="accounts/login/">Login</Link>
-              </Button>
+              {!isAuthenticated && (
+                <Button variant="ghost" size="sm">
+                  <Link href="accounts/login/">Login</Link>
+                </Button>
+              )}
               <Button variant="ghost" size="sm">
                 <Link href="dashboard/">Dashboard</Link>
               </Button>
