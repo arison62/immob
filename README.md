@@ -64,7 +64,7 @@ immob/
 │       ├── components/    # Composants React réutilisables
 │       ├── lib/           # Utilitaires (cn helper, etc.)
 │       ├── pages/         # Composants pages Inertia
-│       └── main.jsx       # Point d'entrée React/Inertia
+│       └── main.tsx       # Point d'entrée React/Inertia
 ├── templates/             # Templates Django de base
 │   └── base.html          # Template racine pour Inertia
 ├── docs/                  # Documentation du projet
@@ -268,7 +268,7 @@ def index(request):
 
 Le composant React correspondant dans `frontend/js/pages/Dashboard.jsx` :
 
-```jsx
+```tsx
 import React from 'react';
 import { Head } from '@inertiajs/react';
 
@@ -295,27 +295,27 @@ frontend/
 │   └── main.css                # Styles Generer
 │   └── tailwind.css            # Styles Tailwind principaux
 └── js/
-    ├── main.jsx               # Point d'entrée Inertia/React
+    ├── main.tsx               # Point d'entrée Inertia/React
     ├── pages/                 # Pages Inertia (routes)
-    │   ├── Dashboard.jsx
+    │   ├── Dashboard.tsx
     │   ├── Properties/
-    │   │   ├── Index.jsx
-    │   │   ├── Show.jsx
-    │   │   └── Create.jsx
+    │   │   ├── Index.tsx
+    │   │   ├── Show.tsx
+    │   │   └── Create.tsx
     │   └── Auth/
-    │       ├── Login.jsx
-    │       └── Register.jsx
+    │       ├── Login.tsx
+    │       └── Register.tsx
     ├── components/            # Composants réutilisables
     │   ├── ui/               # Composants Shadcn UI
-    │   │   ├── button.jsx
-    │   │   ├── card.jsx
+    │   │   ├── button.tsx
+    │   │   ├── card.tsx
     │   │   └── ...
     │   ├── layout/
-    │   │   ├── Header.jsx
-    │   │   └── Sidebar.jsx
-    │   └── PropertyCard.jsx
+    │   │   ├── Header.tsx
+    │   │   └── Sidebar.tsx
+    │   └── PropertyCard.tsx
     └── lib/
-        └── utils.js          # Utilitaires (cn helper, etc.)
+        └── utils.ts          # Utilitaires (cn helper, etc.)
 ```
 
 ### Modèles Django (exemple)
@@ -388,7 +388,7 @@ Les contributions sont les bienvenues ! Pour contribuer :
 ### Standards de code
 
 - **Python** : Suivre PEP 8
-- **JavaScript** : Utiliser ESLint (config fournie)
+- **TypeScript** : Utiliser ESLint (config fournie)
 - **Commits** : Messages clairs et descriptifs en français ou anglais
 
 ## 👥 Équipe
