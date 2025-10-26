@@ -1,23 +1,16 @@
 import * as React from "react"
 import {
-  ArrowUpCircleIcon,
-  BarChartIcon,
-  CameraIcon,
-  ClipboardListIcon,
-  DatabaseIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
-  FolderIcon,
-  HelpCircleIcon,
+  Building2,
   LayoutDashboardIcon,
-  ListIcon,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
+  InboxIcon,
+  NotebookIcon,
+  LandmarkIcon,
+  ConstructionIcon,
 } from "lucide-react"
 
-import { NavDocuments } from "@/components/nav-documents"
+import { NavLocations } from "@/components/nav-location"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -30,6 +23,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Link } from "@inertiajs/react"
+
 
 const data = {
   user: {
@@ -42,111 +37,86 @@ const data = {
       title: "Dashboard",
       url: "#",
       icon: LayoutDashboardIcon,
+      access: {},
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: ListIcon,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: BarChartIcon,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: FolderIcon,
-    },
-    {
-      title: "Team",
+      title: "Equipes",
       url: "#",
       icon: UsersIcon,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      access: {
+        role: "OWNER",
+      },
     },
     {
-      title: "Proposal",
-      icon: FileTextIcon,
+      title: "Biens",
       url: "#",
+      icon: InboxIcon,
+      access: {
+        property_scope_perm: true,
+      },
       items: [
         {
-          title: "Active Proposals",
+          title: "Immeubles",
           url: "#",
+          access: {
+            building_scope_perm: true,
+          },
         },
         {
-          title: "Archived",
+          title: "Propriétés",
           url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
+          access: {
+            property_scope_perm: true,
+          },
         },
       ],
     },
   ],
   navSecondary: [
     {
-      title: "Settings",
+      title: "Parametres",
       url: "#",
       icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
+      access: {
+        role: "OWNER",
+      },
     },
   ],
-  documents: [
+  locations: [
     {
-      name: "Data Library",
+      title: "Contrats",
       url: "#",
-      icon: DatabaseIcon,
+      icon: NotebookIcon,
+      access: {
+        property_scope_perm: true,
+      },
     },
     {
-      name: "Reports",
+      title: "Locataires",
       url: "#",
-      icon: ClipboardListIcon,
+      icon: UsersIcon,
+      access: {
+        property_scope_perm: true,
+      },
     },
     {
-      name: "Word Assistant",
+      title: "Finances",
       url: "#",
-      icon: FileIcon,
+      icon: LandmarkIcon,
+      access: {
+        property_scope_perm: true,
+      },
+    },
+    {
+      title: "Maintenance",
+      url: "#",
+      icon: ConstructionIcon,
+      access: {
+        property_scope_perm: true,
+      },
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -156,19 +126,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              <Link href="#">
+                <Building2 className="h-5 w-5" />
+                <span className="text-base font-semibold">Immob.</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavLocations items={data.locations} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

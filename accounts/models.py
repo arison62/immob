@@ -148,7 +148,7 @@ class UserPropertyPermission(ImmobBaseModel):
     
     granted_by = models.ForeignKey(
         ImmobUser,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         related_name='granted_permissions'
     )

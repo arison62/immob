@@ -8,7 +8,7 @@ import {
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
-  WebGLRendererParameters,
+  type WebGLRendererParameters,
   SRGBColorSpace,
   MathUtils,
   Vector2,
