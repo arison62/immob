@@ -35,13 +35,15 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard/",
       icon: LayoutDashboardIcon,
-      access: {},
+      access: {
+        role: "OWNER",
+      },
     },
     {
       title: "Equipes",
-      url: "#",
+      url: "/dashboard/teams/",
       icon: UsersIcon,
       access: {
         role: "OWNER",
@@ -57,14 +59,14 @@ const data = {
       items: [
         {
           title: "Immeubles",
-          url: "#",
+          url: "/dashboard/buildings/",
           access: {
             building_scope_perm: true,
           },
         },
         {
           title: "Propriétés",
-          url: "#",
+          url: "/dashboard/properties/",
           access: {
             property_scope_perm: true,
           },
@@ -85,7 +87,7 @@ const data = {
   locations: [
     {
       title: "Contrats",
-      url: "#",
+      url: "/dashboard/contrats/",
       icon: NotebookIcon,
       access: {
         property_scope_perm: true,
@@ -93,7 +95,7 @@ const data = {
     },
     {
       title: "Locataires",
-      url: "#",
+      url: "/dashboard/tenants/",
       icon: UsersIcon,
       access: {
         property_scope_perm: true,
@@ -101,7 +103,7 @@ const data = {
     },
     {
       title: "Finances",
-      url: "#",
+      url: "/dashboard/finances/",
       icon: LandmarkIcon,
       access: {
         property_scope_perm: true,
@@ -109,7 +111,7 @@ const data = {
     },
     {
       title: "Maintenance",
-      url: "#",
+      url: "/dashboard/maintenances/",
       icon: ConstructionIcon,
       access: {
         property_scope_perm: true,

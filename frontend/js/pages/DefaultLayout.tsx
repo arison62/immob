@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { usePage } from "@inertiajs/react";
 import { useEffect, type ReactNode } from "react";
 
-const Layout = ({ children }: { children: ReactNode }) => {
+export const DefaultLayout = ({ children }: { children: ReactNode }) => {
   const { messages } = usePage().props as Record<string, any> ;
   useEffect(() => {
     messages.map((msg : any) => {
@@ -33,4 +33,5 @@ const Layout = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default (page: ReactNode) => <Layout>{page}</Layout>;
+// eslint-disable-next-line react-refresh/only-export-components
+export default (page: ReactNode) => <DefaultLayout>{page}</DefaultLayout>;

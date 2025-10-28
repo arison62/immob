@@ -27,7 +27,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth, useGlobalPermissions } from "@/store/appStore"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 
 export function NavLocations({
   items,
@@ -56,6 +56,7 @@ export function NavLocations({
   const { isMobile } = useSidebar()
   const { globalPermissions } = useGlobalPermissions();
   const {user} = useAuth();
+  const url = usePage().url
   const role = user?.role
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -71,7 +72,10 @@ export function NavLocations({
                   (item.access.building_scope_perm &&
                     globalPermissions.building_scope_perm)) && (
                   <Link href={item.url}>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      isActive={url === item.url}
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       {item.items && (
@@ -91,7 +95,10 @@ export function NavLocations({
                         (subItem.access.building_scope_perm &&
                           globalPermissions.building_scope_perm)) && (
                         <Link href={subItem.url}>
-                          <SidebarMenuButton tooltip={subItem.title}>
+                          <SidebarMenuButton
+                            tooltip={subItem.title}
+                            isActive={url === item.url}
+                          >
                             {subItem.icon && <subItem.icon />}
                             <span>{subItem.title}</span>
                           </SidebarMenuButton>

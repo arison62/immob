@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-import { createRoot} from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { createInertiaApp } from "@inertiajs/react";
-import Layout from "@/components/Layout";
+import Layout from "@/pages/DefaultLayout";
 import { Toaster } from "@/components/ui/sonner";
 import AppInitializer from "./AppInitializer";
 
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const initialAuth = props.initialPage.props.auth as {
         user: Record<string, any>;
       };
-    
+
       createRoot(el).render(
         <StrictMode>
           <AppInitializer initialAuth={initialAuth}>

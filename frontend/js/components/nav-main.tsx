@@ -18,6 +18,7 @@ import {
 
 import { useAuth, useGlobalPermissions } from "@/store/appStore";
 import { Link } from "@inertiajs/react";
+import {usePage} from "@inertiajs/react";
 
 export function NavMain({
   items,
@@ -46,7 +47,8 @@ export function NavMain({
   const { globalPermissions } = useGlobalPermissions();
   const {user} = useAuth();
   const role = user?.role
-
+  const {url} = usePage()
+  console.log(url)
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -80,7 +82,10 @@ export function NavMain({
                     (item.access.building_scope_perm &&
                       globalPermissions.building_scope_perm)) && (
                     <Link href={item.url}>
-                      <SidebarMenuButton tooltip={item.title}>
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        isActive={url === item.url}
+                      >
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                         {item.items && (
@@ -101,7 +106,10 @@ export function NavMain({
                           (subItem.access.building_scope_perm &&
                             globalPermissions.building_scope_perm)) && (
                           <Link href={subItem.url}>
-                            <SidebarMenuButton tooltip={subItem.title}>
+                            <SidebarMenuButton
+                              tooltip={subItem.title}
+                              isActive={url === subItem.url}
+                            >
                               {subItem.icon && <subItem.icon />}
                               <span>{subItem.title}</span>
                             </SidebarMenuButton>
