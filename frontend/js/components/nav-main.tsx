@@ -48,7 +48,7 @@ export function NavMain({
   const {user} = useAuth();
   const role = user?.role
   const {url} = usePage()
-  console.log(url)
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">

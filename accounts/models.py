@@ -19,7 +19,7 @@ class ImmobUser(SoftDeletedModelMixin, ImmobBaseModel, AbstractUser):
         db_index=True
     )
     phone = models.CharField(
-        max_length=20,
+        max_length=25,
         null=True,
         blank=True,
         verbose_name=_('Phone number')

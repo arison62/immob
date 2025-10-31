@@ -22,7 +22,7 @@ export function SiteHeader() {
     const createName = () => {
       let parts = url.url.split("/");
       parts = parts.filter((part) => part !== "");
-      console.log(parts);
+    
       const pageId = parts[parts.length - 1];
 
       if (pageId in dashboardPageName) {
