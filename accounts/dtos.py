@@ -30,6 +30,7 @@ class UserUpdateDTO(BaseModel):
     Utilisé par TeamService.update_user.
     """
     first_name: Optional[str] = Field(None, max_length=150)
+    email: Optional[EmailStr] = None
     last_name: Optional[str] = Field(None, max_length=150)
     phone: Optional[str] = Field(None, max_length=20)
     role: Optional[str] = None # MANAGER ou VIEWER pour l'équipe

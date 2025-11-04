@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@inertiajs/react";
-import { useAuth } from "@/store/appStore";
+import { useAuth } from "@/store/app-store";
 
 export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

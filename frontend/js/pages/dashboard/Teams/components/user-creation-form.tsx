@@ -17,17 +17,16 @@ import {
   FieldLegend,
   FieldDescription,
 } from "@/components/ui/field";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import { useEffect, type FormEvent } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { useStore } from "zustand";
+import { useShallow } from "zustand/shallow";
+import { useTeamStore, type User } from "../team-store";
 
 type UserFormData = {
+  id?: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -43,28 +42,70 @@ const USER_ROLES = [
   { value: "VIEWER", label: "Consultant" },
 ];
 
-export default function UserCreationForm({
-  initialData = {},
-}: {
-  initialData?: Partial<UserFormData>;
-}) {
-  const { data, setData, post, processing, errors, reset } = useForm({
-    first_name: initialData.first_name || "",
-    last_name: initialData.last_name || "",
-    email: initialData.email || "",
-    phone: initialData.phone || "",
-    role: initialData.role || "MANAGER", // Rôle par défaut MANAGER ou à définir
-    password: "",
-    password_confirmation: "",
-  });
+export default function UserCreationForm() {
+  const { selectedUser, addUser, updateUser, clearSelection } = useStore(
+    useTeamStore,
+    useShallow((state) => ({
+      selectedUser: state.selectedUser,
+      addUser: state.addUser,
+      updateUser: state.updateUser,
+      clearSelection: state.clearSelection,
+    }))
+  );
+  const isEditing = !!selectedUser;
+  const { data, setData, post, put, processing, errors, reset, clearErrors } =
+    useForm<UserFormData>({
+      id: undefined,
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      role: "VIEWER",
+      password: "",
+      password_confirmation: "",
+    });
+
+  useEffect(() => {
+    if (selectedUser) {
+      // Mode Édition
+      setData({
+        first_name: selectedUser.first_name,
+        last_name: selectedUser.last_name,
+        email: selectedUser.email,
+        id: selectedUser.id,
+        role: selectedUser.role,
+        phone: selectedUser.phone || "",
+        password: "",
+        password_confirmation: "",
+      });
+    } else {
+      reset();
+    }
+    clearErrors();
+  }, [selectedUser]);
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    post("", {
+    const method = isEditing ? put : post;
+    method("", {
       preserveScroll: true,
       replace: false,
-      onSuccess: () => reset("password", "password_confirmation"),
-      
+      except: ["users"],
+      onSuccess: ({ props }) => {
+        const updatedOrNewUser = props.user as User;
+        console.log("Props user : ", updatedOrNewUser)
+        if (isEditing) {
+          updateUser(updatedOrNewUser);
+        } else {
+          addUser(updatedOrNewUser);
+        }
+        clearSelection();
+        clearErrors()
+        reset("password", "password_confirmation");
+      },
+      onError: (err)=>{
+        console.log("Error : ", err)
+      }
     });
   };
 
@@ -176,51 +217,67 @@ export default function UserCreationForm({
           </FieldGroup>
 
           {/* Section Mot de Passe */}
-          <FieldSet>
-            <FieldLegend>Définir le mot de passe</FieldLegend>
-            <FieldGroup>
-              <Field orientation="responsive" data-invalid={!!errors.password}>
-                <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-                <FieldContent>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={data.password}
-                    onChange={(e) => setData("password", e.target.value)}
-                    autoComplete="new-password"
-                    disabled={processing}
-                  />
-                  <FieldError>{errors.password}</FieldError>
-                </FieldContent>
-              </Field>
+          {!isEditing && (
+            <FieldSet>
+              <FieldLegend>Définir le mot de passe</FieldLegend>
+              <FieldGroup>
+                <Field
+                  orientation="responsive"
+                  data-invalid={!!errors.password}
+                >
+                  <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={data.password}
+                      onChange={(e) => setData("password", e.target.value)}
+                      autoComplete="new-password"
+                      disabled={processing}
+                    />
+                    <FieldError>{errors.password}</FieldError>
+                  </FieldContent>
+                </Field>
 
-              <Field
-                orientation="responsive"
-                data-invalid={!!errors.password_confirmation}
-              >
-                <FieldLabel htmlFor="password_confirmation">
-                  Confirmer mot de passe
-                </FieldLabel>
-                <FieldContent>
-                  <Input
-                    id="password_confirmation"
-                    type="password"
-                    value={data.password_confirmation}
-                    onChange={(e) =>
-                      setData("password_confirmation", e.target.value)
-                    }
-                    autoComplete="new-password"
-                    disabled={processing}
-                  />
-                  <FieldError>{errors.password_confirmation}</FieldError>
-                </FieldContent>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
+                <Field
+                  orientation="responsive"
+                  data-invalid={!!errors.password_confirmation}
+                >
+                  <FieldLabel htmlFor="password_confirmation">
+                    Confirmer mot de passe
+                  </FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="password_confirmation"
+                      type="password"
+                      value={data.password_confirmation}
+                      onChange={(e) =>
+                        setData("password_confirmation", e.target.value)
+                      }
+                      autoComplete="new-password"
+                      disabled={processing}
+                    />
+                    <FieldError>{errors.password_confirmation}</FieldError>
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          )}
+
           <Field orientation="horizontal" className="justify-end">
-            <Button type="submit" disabled={processing || !validatePasswordMatch()}>
+            <Button
+              type="submit"
+              disabled={processing || (!isEditing && !validatePasswordMatch())}
+              // Désactiver si les mots de passe ne correspondent pas
+            >
               {processing && <Spinner />}
-              {processing ? "Création en cours..." : "Créer l'utilisateur"}
+              {processing
+                ? isEditing
+                  ? "Mise à jour..."
+                  : "Création en cours..."
+                : isEditing
+                ? "Sauvegarder les modifications"
+                : "Créer l'utilisateur"}
             </Button>
           </Field>
         </CardContent>

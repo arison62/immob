@@ -53,6 +53,9 @@ class ImmobUser(SoftDeletedModelMixin, ImmobBaseModel, AbstractUser):
             models.Index(fields=['email', 'is_active']),
             models.Index(fields=['role', 'is_deleted']),
         ]
+    
+    class InertiaMeta:
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone', 'role', 'is_active', 'created_at')
 
     def __str__(self):
         return f"{self.get_full_name()} ({self.email})"

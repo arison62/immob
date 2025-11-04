@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, type ReactNode } from "react";
-import { appStore, type PermissionLevel } from "@/store/appStore";
+import { appStore, type PermissionLevel } from "@/store/app-store";
 import axios from "axios";
 
 interface AuthProviderProps {

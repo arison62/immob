@@ -71,7 +71,8 @@ class TeamService:
         :return: L'objet ImmobUser mis à jour.
         """
         
-        user_to_update = ImmobUser.objects.get(id=user_id, is_deleted=False)
+        user_to_update = ImmobUser.objects.get(id=user_id)
+        
         if not user_to_update:
             raise ValueError("Utilisateur non trouvé.")
         

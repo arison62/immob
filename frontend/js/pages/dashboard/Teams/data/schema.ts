@@ -13,6 +13,7 @@ import { z } from "zod";
 // export type Task = z.infer<typeof taskSchema>
 
 export const userSchema = z.object({
+  id: z.uuid(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   email: z.email(),

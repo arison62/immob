@@ -18,7 +18,7 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { Link } from "@inertiajs/react";
-import { useAuth, useGlobalPermissions } from "@/store/appStore";
+import { useAuth, useGlobalPermissions } from "@/store/app-store";
 
 export function NavSecondary({
   items,

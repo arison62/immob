@@ -26,7 +26,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useAuth, useGlobalPermissions } from "@/store/appStore"
+import { useAuth, useGlobalPermissions } from "@/store/app-store"
 import { Link, usePage } from "@inertiajs/react"
 
 export function NavLocations({
