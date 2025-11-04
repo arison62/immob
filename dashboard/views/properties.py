@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
-from accounts.services import AccessControlService
+from accounts.services.access_services import AccessControlService
 
 
 class PropertiesView(LoginRequiredMixin, View):

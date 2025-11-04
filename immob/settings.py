@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     "accounts",
     "holdings",
     "finance",
-    "audit"
     
 ]
 
@@ -70,6 +69,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "inertia.middleware.InertiaMiddleware",
+    
     "immob.middleware.DataShareMiddleware",
     "immob.middleware.UserAuthMiddleware",
 ]

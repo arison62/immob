@@ -39,7 +39,6 @@ type UserFormData = {
 
 // Rôles définis dans accounts/models.py
 const USER_ROLES = [
-  { value: "OWNER", label: "Propriétaire" },
   { value: "MANAGER", label: "Gestionnaire" },
   { value: "VIEWER", label: "Consultant" },
 ];
@@ -64,9 +63,16 @@ export default function UserCreationForm({
     post("", {
       preserveScroll: true,
       replace: false,
-      except: ["users"],
       onSuccess: () => reset("password", "password_confirmation"),
+      
     });
+  };
+
+  const validatePasswordMatch = () => {
+    if (!data.password || !data.password_confirmation) {
+      return false; // Ne pas valider si l'un des champs est vide
+    }
+    return data.password === data.password_confirmation;
   };
 
   return (
@@ -212,7 +218,7 @@ export default function UserCreationForm({
             </FieldGroup>
           </FieldSet>
           <Field orientation="horizontal" className="justify-end">
-            <Button type="submit" disabled={processing}>
+            <Button type="submit" disabled={processing || !validatePasswordMatch()}>
               {processing && <Spinner />}
               {processing ? "Création en cours..." : "Créer l'utilisateur"}
             </Button>

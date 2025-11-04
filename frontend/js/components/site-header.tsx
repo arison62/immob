@@ -28,7 +28,7 @@ export function SiteHeader() {
       if (pageId in dashboardPageName) {
         setPageName(dashboardPageName[pageId]);
       }
-      console.log(pageId);
+  
     };
     createName();
   }, [url]);
