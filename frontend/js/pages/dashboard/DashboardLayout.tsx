@@ -8,9 +8,8 @@ import { toast } from "sonner";
 
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { messages, ...rest } = usePage().props as Record<string, any>;
-  const page = usePage();
- console.log("Messages from server:", page);
+  const { messages} = usePage().props as Record<string, any>;
+
 
   useEffect(() => {
     messages.map((msg: any) => {
