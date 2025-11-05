@@ -46,7 +46,7 @@ export default function Index() {
     {
       name: "Doubla Senguel",
       github: "",
-      linkedin: "https://www.linkedin.com/in/senguel-doubla-8b42582b5/",
+      linkedin: "",
     },
     {
       name: "TSAGUE Bryan",
