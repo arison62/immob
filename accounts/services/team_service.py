@@ -44,6 +44,7 @@ class TeamService:
             phone=user_data.phone,
             role=user_data.role,
             created_by=acting_user, # Trace qui a créé le compte
+            workspace=acting_user.workspace
         )
 
         # --- 3. Audit Log ---

@@ -40,6 +40,13 @@ class ImmobUser(SoftDeletedModelMixin, ImmobBaseModel, AbstractUser):
         related_name='created_users'
     )
 
+    workspace = models.ForeignKey(
+        'Workspace',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='users'
+    )
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -71,13 +78,13 @@ class ImmobUser(SoftDeletedModelMixin, ImmobBaseModel, AbstractUser):
         return False
 
 
-class Owner(SoftDeletedModelMixin, ImmobBaseModel):
-    """Profil propriétaire lié à un utilisateur"""
+class Workspace(SoftDeletedModelMixin, ImmobBaseModel):
+    """Workspace lié à un propriétaire"""
     
-    user = models.OneToOneField(
+    admin = models.OneToOneField(
         ImmobUser,
         on_delete=models.CASCADE,
-        related_name='owner_profile',
+        related_name='admin_workspace',
         limit_choices_to={'role': ImmobUser.UserRole.OWNER}
     )
     company_name = models.CharField(
@@ -100,24 +107,14 @@ class Owner(SoftDeletedModelMixin, ImmobBaseModel):
     all_objects = models.Manager()
 
     class Meta:
-        db_table = 'immob_owners'
-        verbose_name = _('Owner')
-        verbose_name_plural = _('Owners')
+        db_table = 'immob_workspace'
+        verbose_name = _('Workspace')
+        verbose_name_plural = _('Workspaces')
 
     def __str__(self):
-        return f"{self.company_name or self.user.get_full_name()}"
+        return f"{self.company_name or 'Workspace'} - Admin: {self.admin.get_full_name()}"
 
-    def create_manager(self, email, first_name, last_name, **kwargs):
-        """Crée un utilisateur manager pour ce propriétaire"""
-        manager = ImmobUser.objects.create_user(
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            role=ImmobUser.UserRole.MANAGER,
-            created_by=self.user,
-            **kwargs
-        )
-        return manager
+
 
 
 class UserPropertyPermission(ImmobBaseModel):

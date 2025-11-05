@@ -12,8 +12,8 @@ from core.models import SoftDeletedModelMixin, ImmobBaseModel, ImmobDefaultManag
 class Building(SoftDeletedModelMixin, ImmobBaseModel):
     """Bâtiment contenant plusieurs propriétés"""
     
-    owner = models.ForeignKey(
-        "accounts.Owner",
+    workspace = models.ForeignKey(
+        "accounts.Workspace",
         on_delete=models.CASCADE,
         related_name='buildings'
     )
@@ -42,7 +42,7 @@ class Building(SoftDeletedModelMixin, ImmobBaseModel):
         verbose_name = _('Building')
         verbose_name_plural = _('Buildings')
         indexes = [
-            models.Index(fields=['owner', 'city']),
+            models.Index(fields=['workspace', 'city']),
             models.Index(fields=['postal_code']),
         ]
 
@@ -90,10 +90,10 @@ class Property(SoftDeletedModelMixin, ImmobBaseModel):
         null=True,
         blank=True
     )
-    owner = models.ForeignKey(
-        "accounts.Owner",
+    workspace = models.ForeignKey(
+        "accounts.Workspace",
         on_delete=models.CASCADE,
-        related_name='owner_properties'
+        related_name='workspace_properties'
     )
     
     reference_code = models.CharField(
@@ -171,7 +171,7 @@ class Property(SoftDeletedModelMixin, ImmobBaseModel):
         verbose_name = _('Property')
         verbose_name_plural = _('Properties')
         indexes = [
-            models.Index(fields=['owner', 'status']),
+            models.Index(fields=['workspace', 'status']),
             models.Index(fields=['building', 'floor']),
             models.Index(fields=['type', 'status']),
             models.Index(fields=['reference_code']),

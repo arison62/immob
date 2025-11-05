@@ -3,12 +3,12 @@ from .models import Property, Building, PropertyPhoto, MaintenanceLog
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'address', 'floor_count')
+    list_display = ('name', 'workspace', 'address', 'floor_count')
 
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('building', 'owner', 'reference_code', 'type', 'status')
+    list_display = ('building', 'workspace', 'reference_code', 'type', 'status')
     list_filter = ('type', 'status')
 
 

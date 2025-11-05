@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ImmobUser, Owner, UserPropertyPermission
+from .models import ImmobUser, Workspace, UserPropertyPermission
 
 
 @admin.register(ImmobUser)
@@ -11,14 +11,14 @@ class ImmobUserAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 
-@admin.register(Owner)
-class OwnerAdmin(admin.ModelAdmin):
-    list_display = ('get_user', 'company_name', 'tax_number', 'full_address')
+@admin.register(Workspace)
+class WorkspaceAdmin(admin.ModelAdmin):
+    list_display = ('admin', 'company_name', 'tax_number', 'full_address')
     search_fields = ('company_name', 'tax_number', 'full_address')
     ordering = ('company_name',)
 
-    def get_user(self, obj):
-        return obj.user
+    def admin(self, obj):
+        return obj.admin
     
 
 @admin.register(UserPropertyPermission)
