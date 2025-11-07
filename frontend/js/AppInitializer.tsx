@@ -36,7 +36,6 @@ export default function AppInitializer({
       
         const permissions = response.data as {
           bulding_scope_perm: PermissionLevel;
-          property_scope_perm: PermissionLevel;
         };
 
         setGlobalPermissions(permissions as any);

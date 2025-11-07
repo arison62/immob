@@ -3,13 +3,12 @@ import { useShallow } from "zustand/shallow";
 
 export type PermissionLevel =
   | "none"
-  | "can_view"
-  | "can_update"
-  | "can_create"
-  | "can_delete";
+  | "VIEW"
+  | "UPDATE"
+  | "CREATE"
+  | "DELETE";
 
 interface GlobalPermissions {
-  property_scope_perm: PermissionLevel;
   building_scope_perm: PermissionLevel;
 }
 
@@ -33,7 +32,6 @@ interface AppState {
 }
 
 const initialPermissions: GlobalPermissions = {
-  property_scope_perm: "none",
   building_scope_perm: "none",
 };
 

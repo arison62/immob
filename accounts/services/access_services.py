@@ -1,109 +1,87 @@
-from accounts.models import ImmobUser
+from accounts.models import ImmobUser, UserBuildingPermission
 from django.utils import timezone
 from django.db.models import Q
-from django.utils.functional import cached_property
 from typing import Dict
 
 class AccessControlService:
     
-    PERMISSION_HIERARCHY = [
-        'can_delete',  # Index 0: Le plus fort
-        'can_create',  # Index 1
-        'can_update',  # Index 2
-        'can_view',    # Index 3: Le plus faible
-    ]
+    # Nous mappons les niveaux de permission à un score, du plus fort au plus faible.
+    PERMISSION_HIERARCHY = {
+        UserBuildingPermission.PermissionLevel.DELETE: 4,
+        UserBuildingPermission.PermissionLevel.UPDATE: 3,
+        UserBuildingPermission.PermissionLevel.CREATE: 2,
+        UserBuildingPermission.PermissionLevel.VIEW: 1,
+    }
+    
+    # 2. Map inversée (pour convertir le score en string à la fin)
+    HIERARCHY_TO_STRING = {
+        4: UserBuildingPermission.PermissionLevel.DELETE,
+        3: UserBuildingPermission.PermissionLevel.UPDATE,
+        2: UserBuildingPermission.PermissionLevel.CREATE,
+        1: UserBuildingPermission.PermissionLevel.VIEW,
+        0: 'none', # Le score 0 signifie 'aucun droit'
+    }
 
     @staticmethod
-    def _get_user_permissions(user: ImmobUser):
+    def _get_user_permissions_queryset(user: ImmobUser):
         """
-        Récupère toutes les permissions valides (non supprimées, actives et non expirées) 
-        pour un utilisateur. (Filtrage de sécurité 5.3.2)
+        Récupère le QuerySet de base pour toutes les permissions de bâtiment 
+        valides (actives et non expirées) pour un utilisateur.
+        (Filtrage de sécurité 5.3.2)
         """
-        return user.property_permissions.filter( # type: ignore
-            Q(expires_at__isnull=True) | Q(expires_at__gte=timezone.now()), 
-            is_deleted=False,
+        return UserBuildingPermission.objects.filter(
+            user=user,
+        ).filter(
+            # La permission est valide si elle n'expire pas OU si elle n'a pas encore expiré
+            Q(expires_at__isnull=True) | Q(expires_at__gte=timezone.now())
         )
 
    
     @staticmethod
     def get_global_permission(user: ImmobUser) -> Dict[str, str]:
         """
-        Détermine le meilleur droit maximal atteint pour chaque scope (Building et Property).
-        Ceci permet au frontend de gérer l'affichage de la sidebar de manière granulaire.
+        Détermine le meilleur droit maximal (le plus fort) atteint par l'utilisateur 
+        sur l'ensemble de son périmètre (scope).
         
-        Renvoie : {'building_scope_perm': 'can_view' | 'none', 'property_scope_perm': 'can_create' | 'none'}
+        Conformément à notre architecture (CDC 5.3.2), le périmètre est défini
+        au niveau 'Building', et ce droit cascade aux 'Property'.
+        
+        Renvoie : {'building_scope_perm': 'VIEW' | 'UPDATE' | ... | 'none'}
         """
         
-        # Initialisation par défaut : aucun accès
-        default_result = {
-            'building_scope_perm': 'none',
-            'property_scope_perm': 'none'
-        }
-        
-        # 1. Cas Spécial : Rôle OWNER (Accès total sur les deux scopes)
+        # 1. Cas Spécial : Rôle OWNER (Accès total, le plus haut niveau)
         if user.role == ImmobUser.UserRole.OWNER:
             return {
-                'building_scope_perm': 'can_delete',
-                'property_scope_perm': 'can_delete'
+                'building_scope_perm': UserBuildingPermission.PermissionLevel.DELETE,
             }
 
-        permissions_queryset = AccessControlService._get_user_permissions(user)
+        # 2. Récupérer le QuerySet des permissions valides
+        permissions_queryset = AccessControlService._get_user_permissions_queryset(user)
 
-        # Si aucune permission, renvoie le défaut (1 requête COUNT)
-        if not permissions_queryset.exists():
-            return default_result
+        # 3. Extraire les niveaux de permission distincts (Optimisation)
+        # 1 seule requête DB pour obtenir la liste des droits (ex: ['VIEW', 'UPDATE'])
+        distinct_levels = permissions_queryset.values_list('permission_level', flat=True).distinct()
 
-        # 2. Requête Unique Optimisée (1 SELECT pour toutes les données pertinentes)
-        has_any_permission_q = Q(can_view=True) | Q(can_update=True) | Q(can_create=True) | Q(can_delete=True)
+        if not distinct_levels:
+            # L'utilisateur (MANAGER/VIEWER) n'a aucune permission valide
+            return {
+                'building_scope_perm': 'none',
+            }
 
-        relevant_permissions = permissions_queryset.filter(has_any_permission_q).values(
-            'building_id', 'property_id', 'can_view', 'can_update', 'can_create', 'can_delete'
-        )
+        # 4. Logique de Recherche du Meilleur Droit (en Python, très rapide)
+        # Nous trouvons le score le plus élevé parmi les permissions de l'utilisateur
+        best_level_score = 0
+        for level in distinct_levels:
+            score = AccessControlService.PERMISSION_HIERARCHY.get(level, 0)
+            if score > best_level_score:
+                best_level_score = score
 
-        if not relevant_permissions:
-            return default_result
-            
-        # 3. Logique de Recherche du Meilleur Droit par Scope (en Python, très rapide)
-        
-        # On cherche l'index le plus petit (droit le plus fort)
-        best_building_index = len(AccessControlService.PERMISSION_HIERARCHY) 
-        best_property_index = len(AccessControlService.PERMISSION_HIERARCHY) 
+        # 5. Construction du Résultat Final
+        # Convertit le meilleur score trouvé (ex: 3) en string (ex: 'UPDATE')
+        final_permission_str = AccessControlService.HIERARCHY_TO_STRING.get(best_level_score, 'none')
 
-        for perm_data in relevant_permissions:
-            current_best_index = len(AccessControlService.PERMISSION_HIERARCHY)
-            
-            # 3.1. Trouver le droit le plus fort de CETTE LIGNE
-            for index, action in enumerate(AccessControlService.PERMISSION_HIERARCHY):
-                if perm_data.get(action, False):
-                    current_best_index = index
-                    break # On a trouvé le droit le plus fort pour cette ligne
-
-            # 3.2. Mise à jour de la portée Building (permissions explicites sur Building)
-            if perm_data['building_id'] is not None:
-                if current_best_index < best_building_index:
-                    best_building_index = current_best_index
-
-            # 3.3. Mise à jour de la portée Property
-            # Ceci inclut les permissions Property explicites (property_id is not None)
-            # ET les permissions Building implicites (qui se propagent aux Properties)
-            if perm_data['property_id'] is not None or perm_data['building_id'] is not None:
-                if current_best_index < best_property_index:
-                    best_property_index = current_best_index
-
-
-        # 4. Construction du Résultat Final
-        
-        final_result = {}
-
-        # Si un index a été mis à jour, on renvoie le nom de l'action, sinon 'none'
-        if best_building_index < len(AccessControlService.PERMISSION_HIERARCHY):
-            final_result['building_scope_perm'] = AccessControlService.PERMISSION_HIERARCHY[best_building_index]
-        else:
-            final_result['building_scope_perm'] = 'none'
-
-        if best_property_index < len(AccessControlService.PERMISSION_HIERARCHY):
-            final_result['property_scope_perm'] = AccessControlService.PERMISSION_HIERARCHY[best_property_index]
-        else:
-            final_result['property_scope_perm'] = 'none'
-
-        return final_result
+        # Le scope est unifié : la permission globale sur Building EST la permission 
+        # globale sur Property, car elle reflète le droit maximal de l'utilisateur.
+        return {
+            'building_scope_perm': final_permission_str,
+        }

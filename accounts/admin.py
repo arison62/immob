@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ImmobUser, Workspace, UserPropertyPermission
+from .models import ImmobUser, Workspace, UserBuildingPermission
 
 
 @admin.register(ImmobUser)
@@ -21,8 +21,8 @@ class WorkspaceAdmin(admin.ModelAdmin):
         return obj.admin
     
 
-@admin.register(UserPropertyPermission)
-class UserPropertyPermissionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'building', 'property', 'can_view', 'can_create', 'can_update', 'can_delete', 'granted_by', 'granted_at', 'expires_at')
-    list_filter = ('can_view', 'can_create', 'can_update', 'can_delete', 'granted_by', 'granted_at', 'expires_at')
+@admin.register(UserBuildingPermission)
+class UserBuildingPermissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'building', 'permission_level', 'granted_by', 'granted_at', 'expires_at')
+    list_filter = ('permission_level', 'granted_by', 'granted_at', 'expires_at')
     ordering = ('-granted_at',)

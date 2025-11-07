@@ -1,8 +1,9 @@
 classDiagram
-    %% Classes de Base et Sécurité
+    %% Classes de Base et Sécurité (unchanged except minor relations)
     class User {
         <<entity>>
         -UUID id
+        -UUID workspace_id
         -String email
         -String password
         -String first_name
@@ -24,10 +25,10 @@ classDiagram
         VIEWER
     }
 
-    class Owner {
+    class Workspace {
         <<entity>>
         -UUID id
-        -UUID user_id
+        -UUID admin_user_id
         -String company_name
         -String tax_number
         -String full_address
@@ -37,12 +38,11 @@ classDiagram
         +revokeAccess(user_id) void
     }
 
-    class UserPropertyPermission {
+    class UserBuildingPermission {
         <<entity>>
         -UUID id
         -UUID user_id
         -UUID building_id
-        -UUID property_id
         -Boolean can_view
         -Boolean can_create
         -Boolean can_update
@@ -55,11 +55,11 @@ classDiagram
         +isExpired() Boolean
     }
 
-    %% Classes Métier
+    %% Classes Métier (unchanged except where noted)
     class Building {
         <<entity>>
         -UUID id
-        -UUID owner_id
+        -UUID workspace_id
         -String name
         -String address
         -String city
@@ -80,7 +80,7 @@ classDiagram
         <<entity>>
         -UUID id
         -UUID building_id
-        -UUID owner_id
+        -UUID workspace_id
         -String reference_code
         -String name
         -PropertyType type
@@ -121,6 +121,7 @@ classDiagram
     class Tenant {
         <<entity>>
         -UUID id
+        -UUID workspace_id  %% ADDED: For multi-tenancy isolation
         -String first_name
         -String last_name
         -String email
@@ -131,8 +132,10 @@ classDiagram
         -String emergency_contact_name
         -String emergency_contact_phone
         -DateTime created_at
+        -Decimal outstanding_balance  %% ADDED: Quick financial summary
         +getActiveContracts() Collection~Contract~
         +getHistory() Collection~Contract~
+        +calculateBalance() Decimal  %% ADDED: To compute from payments
     }
 
     class Contract {
@@ -140,6 +143,7 @@ classDiagram
         -UUID id
         -UUID property_id
         -UUID tenant_id
+        -UUID workspace_id  %% ADDED: Direct scoping for queries/finances
         -UUID created_by
         -String contract_number
         -Date start_date
@@ -149,15 +153,17 @@ classDiagram
         -Decimal charges
         -PaymentFrequency payment_frequency
         -ContractStatus status
-        -String terms
+        -JSON terms  %% CHANGED: From String to JSON for structured clauses
         -DateTime signature_date
         -DateTime created_at
         -DateTime updated_at
         -UUID updated_by
+        -Integer amendment_count  %% ADDED: Track revisions
         +activate() void
         +terminate() void
         +isActive() Boolean
         +generatePayments() void
+        +amend(details) void  %% ADDED: For rent adjustments, etc.
     }
 
     class PaymentFrequency {
@@ -184,13 +190,15 @@ classDiagram
         -DateTime payment_date
         -PaymentStatus status
         -PaymentMethod payment_method
-        -String reference_number
+        -String reference_number~encrypted~  %% ADDED: Encryption for sensitive info
         -String notes
         -UUID created_by
         -DateTime created_at
+        -Decimal late_fee  %% ADDED: For automated escalations
         +markAsPaid() void
         +isLate() Boolean
         +calculateLateDays() Integer
+        +applyLateFee() void  %% ADDED: Business logic for finances
     }
 
     class PaymentStatus {
@@ -199,6 +207,7 @@ classDiagram
         PAID
         LATE
         CANCELLED
+        PARTIAL  %% ADDED: For partial payments/refunds
     }
 
     class PaymentMethod {
@@ -209,83 +218,41 @@ classDiagram
         CARD
     }
 
-    class PropertyPhoto {
+    %% NEW: For financial documents
+    class Invoice {
         <<entity>>
         -UUID id
-        -UUID property_id
-        -String file_path
-        -String file_name
-        -Boolean is_primary
-        -Integer display_order
-        -DateTime uploaded_at
-        +setAsPrimary() void
-    }
-
-    class MaintenanceLog {
-        <<entity>>
-        -UUID id
-        -UUID property_id
-        -MaintenanceType type
-        -Date scheduled_date
-        -DateTime completion_date
-        -MaintenanceStatus status
-        -String description
-        -Decimal cost
-        -String technician_name
-        -UUID created_by
+        -UUID payment_id  %% Or contract_id if contract-level
+        -String invoice_number
+        -Date issue_date
+        -Decimal total_amount
+        -String pdf_path  %% Storage for generated invoice
+        -InvoiceStatus status
         -DateTime created_at
-        +complete() void
-        +cancel() void
+        +generatePdf() void
+        +sendToTenant() void
     }
 
-    class MaintenanceType {
+    class InvoiceStatus {
         <<enumeration>>
-        REPAIR
-        INSPECTION
-        CLEANING
-        IMPROVEMENT
+        DRAFT
+        SENT
+        PAID
+        OVERDUE
     }
 
-    class MaintenanceStatus {
-        <<enumeration>>
-        SCHEDULED
-        IN_PROGRESS
-        COMPLETED
-        CANCELLED
-    }
+    %% Other classes unchanged (PropertyPhoto, MaintenanceLog, etc.)
 
-    class AuditLog {
-        <<entity>>
-        -UUID id
-        -UUID user_id
-        -AuditAction action
-        -String entity_type
-        -UUID entity_id
-        -JSON old_values
-        -JSON new_values
-        -String ip_address
-        -String user_agent
-        -DateTime action_date
-        +log(user, action, entity) void
-    }
-
-    class AuditAction {
-        <<enumeration>>
-        CREATE
-        UPDATE
-        DELETE
-        VIEW
-        ACCESS_DENIED
-    }
-
-    %% Relations
+    %% Relations (updated)
     User "1" -- "1" Role : has
-    User "1" -- "0..1" Owner : is
-    User "1" -- "0..*" UserPropertyPermission : has
+    User "1" -- "0..1" Workspace : administers_as_owner  %% Clarified "Owner" relation
+    User "1" -- "0..*" UserBuildingPermission : has
     User "1" -- "0..*" AuditLog : performs
     
-    Owner "1" -- "0..*" Building : owns
-    Owner "1" -- "0..*" Property : owns
+    Workspace "1" -- "0..*" Building : contains
+    Workspace "1" -- "0..*" Property : contains
+    Workspace "1" -- "0..*" Tenant : manages  %% ADDED
+    Workspace "1" -- "0..*" Contract : manages  %% ADDED
     
     Building "0..1" -- "0..*" Property : contains
     
@@ -303,15 +270,18 @@ classDiagram
     
     Payment "1" -- "1" PaymentStatus : has
     Payment "1" -- "1" PaymentMethod : paid_with
+    Payment "1" -- "0..*" Invoice : generates  %% ADDED: Links finances to documents
     
     MaintenanceLog "1" -- "1" MaintenanceType : is
     MaintenanceLog "1" -- "1" MaintenanceStatus : has
     
-    UserPropertyPermission "*" -- "0..1" Building : scoped_to
-    UserPropertyPermission "*" -- "0..1" Property : scoped_to
+    UserBuildingPermission "*" -- "0..1" Building : scoped_to
+    UserBuildingPermission "*" -- "0..1" Property : scoped_to
     
-    %% Notes de sécurité
+    %% Notes de sécurité (updated)
     note for User "Secure authentication\npassword_hash with bcrypt/Argon2\nSession management"
-    note for UserPropertyPermission "Granular access control\nAutomatic expiration\nMandatory audit"
-    note for Tenant "Sensitive data encrypted\nid_number encrypted\nGDPR compliant"
-    note for AuditLog "Complete traceability\n2 years minimum retention\nDenied access attempts logged"
+    note for UserBuildingPermission "Granular access control\nAutomatic expiration\nMandatory audit\nExtend to Tenant/Contract if needed"
+    note for Tenant "Sensitive data encrypted\nid_number encrypted\nGDPR compliant\nFinancial fields read-only for viewers"
+    note for AuditLog "Complete traceability\n2 years minimum retention\nDenied access attempts logged\nLog all financial changes"
+    note for Contract "Encrypt financial details\nTrack amendments in AuditLog"
+    note for Payment "Encrypt reference_number\nAutomate late fees in business logic"

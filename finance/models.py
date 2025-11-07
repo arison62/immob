@@ -7,7 +7,11 @@ from django.utils import timezone
 
 class Tenant(SoftDeletedModelMixin, ImmobBaseModel):
     """Locataire"""
-    
+    workspace = models.ForeignKey(
+        "accounts.Workspace",
+        on_delete=models.CASCADE,
+        related_name='tenants'
+        )
     first_name = models.CharField(max_length=100, verbose_name=_('First name'))
     last_name = models.CharField(
         max_length=100, verbose_name=_('Last name'), 
@@ -84,7 +88,11 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
         MONTHLY = 'MONTHLY', _('Monthly')
         QUARTERLY = 'QUARTERLY', _('Quarterly')
         ANNUALLY = 'ANNUALLY', _('Annually')
-
+    workspace = models.ForeignKey(
+        "accounts.Workspace",
+        on_delete=models.CASCADE,
+        related_name='contracts'
+    )
     property = models.ForeignKey(
         "holdings.Property",
         on_delete=models.PROTECT,
@@ -346,3 +354,51 @@ class Payment(ImmobBaseModel):
         if not self.is_late():
             return 0
         return (timezone.now().date() - self.due_date).days
+
+class Invoice(ImmobBaseModel):
+    class InvoiceStatus(models.TextChoices):
+        DRAFT = 'DRAFT', _('Draft')
+        SENT = 'SENT', _('Sent')
+        PAID = 'PAID', _('Paid')
+        OVERDUE = 'OVERDUE', _('Overdue')
+    payment = models.ForeignKey(
+        Payment,
+        on_delete=models.PROTECT,
+        related_name='payment_invoices'
+    )
+    invoice_number = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_('Invoice number'),
+        db_index=True
+    )
+    issue_date = models.DateField(verbose_name=_('Issue date'), db_index=True)
+    total_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))],
+        verbose_name=_('Total amount')
+    )
+    pdf = models.FileField(
+        upload_to='invoices/',
+        null=True,
+        blank=True,
+        verbose_name=_('Invoice PDF')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=InvoiceStatus.choices,
+        default=InvoiceStatus.DRAFT,
+        verbose_name=_('Status'),
+        db_index=True
+    )
+    class Meta:
+        db_table = 'immob_invoices'
+        verbose_name = _('Invoice')
+        verbose_name_plural = _('Invoices')
+        indexes = [
+            models.Index(fields=['payment', 'issue_date']),
+            models.Index(fields=['status', 'issue_date']),
+            models.Index(fields=['invoice_number']),
+        ]
+    

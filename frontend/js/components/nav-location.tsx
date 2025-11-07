@@ -1,20 +1,22 @@
-"use client"
+"use client";
 
 import {
-  ChevronRight,
   FolderIcon,
   MoreHorizontalIcon,
   EllipsisIcon,
   type LucideIcon,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,42 +24,30 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useAuth, useGlobalPermissions } from "@/store/app-store"
-import { Link, usePage } from "@inertiajs/react"
+} from "@/components/ui/sidebar";
+import { useAuth, useGlobalPermissions } from "@/store/app-store";
+import { Link, usePage } from "@inertiajs/react";
 
 export function NavLocations({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon: LucideIcon
-    items?: {
-      title: string
-      url: string
-      icon?: LucideIcon
-      access: {
-        role?: string
-        property_scope_perm?: boolean
-        building_scope_perm?: boolean
-      }
-    }[]
+    title: string;
+    url: string;
+    icon: LucideIcon;
     access: {
-      role?: string
-      building_scope_perm?: boolean
-      property_scope_perm?: boolean
-    }
-  }[]
+      role?: string;
+      building_scope_perm?: boolean;
+    };
+  }[];
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const { globalPermissions } = useGlobalPermissions();
-  const {user} = useAuth();
-  const url = usePage().url
-  const role = user?.role
+  const { user } = useAuth();
+  const url = usePage().url;
+  const role = user?.role;
+  console.log(items)
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Locations</SidebarGroupLabel>
@@ -67,8 +57,6 @@ export function NavLocations({
             <SidebarMenuItem key={item.title}>
               <CollapsibleTrigger asChild>
                 {((item.access.role && role === item.access.role) ||
-                  (item.access.property_scope_perm &&
-                    globalPermissions.property_scope_perm) ||
                   (item.access.building_scope_perm &&
                     globalPermissions.building_scope_perm)) && (
                   <Link href={item.url}>
@@ -78,36 +66,10 @@ export function NavLocations({
                     >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      {item.items && (
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      )}
                     </SidebarMenuButton>
                   </Link>
                 )}
               </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      {((subItem.access.role && role === subItem.access.role) ||
-                        (subItem.access.property_scope_perm &&
-                          globalPermissions.property_scope_perm) ||
-                        (subItem.access.building_scope_perm &&
-                          globalPermissions.building_scope_perm)) && (
-                        <Link href={subItem.url}>
-                          <SidebarMenuButton
-                            tooltip={subItem.title}
-                            isActive={url === item.url}
-                          >
-                            {subItem.icon && <subItem.icon />}
-                            <span>{subItem.title}</span>
-                          </SidebarMenuButton>
-                        </Link>
-                      )}
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuAction

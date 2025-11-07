@@ -4,10 +4,10 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { DataTableViewOptions } from "../../components/data-table-view-options";
 
 import { roles } from "../data/data";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DataTableFacetedFilter } from "../../components/data-table-faceted-filter";
 import UserCreationForm from "./user-creation-form";
 import { useTeamStore } from "../team-store";
 

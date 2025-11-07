@@ -28,8 +28,8 @@ class Building(SoftDeletedModelMixin, ImmobBaseModel):
     longitude = models.FloatField(null=True, blank=True, verbose_name=_('Longitude'))
     
     floor_count = models.PositiveIntegerField(
-        default=1,
-        validators=[MinValueValidator(1)],
+        default=0,
+        validators=[MinValueValidator(0)],
         verbose_name=_('Number of floors')
     )
     description = models.TextField(blank=True, verbose_name=_('Description'))

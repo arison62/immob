@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   Building2,
   LayoutDashboardIcon,
@@ -8,12 +8,12 @@ import {
   NotebookIcon,
   LandmarkIcon,
   ConstructionIcon,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavLocations } from "@/components/nav-location"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import { NavLocations } from "@/components/nav-location";
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -22,9 +22,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Link } from "@inertiajs/react"
-
+} from "@/components/ui/sidebar";
+import { Link } from "@inertiajs/react";
 
 const data = {
   user: {
@@ -50,28 +49,12 @@ const data = {
       },
     },
     {
-      title: "Biens",
-      url: "#",
+      title: "Propriétés",
+      url: "/dashboard/properties/",
       icon: InboxIcon,
       access: {
-        property_scope_perm: true,
+        building_scope_perm: true,
       },
-      items: [
-        {
-          title: "Immeubles",
-          url: "/dashboard/buildings/",
-          access: {
-            building_scope_perm: true,
-          },
-        },
-        {
-          title: "Propriétés",
-          url: "/dashboard/properties/",
-          access: {
-            property_scope_perm: true,
-          },
-        },
-      ],
     },
   ],
   navSecondary: [
@@ -90,7 +73,7 @@ const data = {
       url: "/dashboard/contrats/",
       icon: NotebookIcon,
       access: {
-        property_scope_perm: true,
+        building_scope_perm: true,
       },
     },
     {
@@ -98,24 +81,20 @@ const data = {
       url: "/dashboard/tenants/",
       icon: UsersIcon,
       access: {
-        property_scope_perm: true,
+        building_scope_perm: true,
       },
     },
     {
       title: "Finances",
       url: "/dashboard/finances/",
       icon: LandmarkIcon,
-      access: {
-        property_scope_perm: true,
-      },
+      access: { building_scope_perm: true },
     },
     {
       title: "Maintenance",
       url: "/dashboard/maintenances/",
       icon: ConstructionIcon,
-      access: {
-        property_scope_perm: true,
-      },
+      access: { building_scope_perm: true },
     },
   ],
 };
@@ -147,5 +126,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

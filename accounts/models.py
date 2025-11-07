@@ -117,13 +117,19 @@ class Workspace(SoftDeletedModelMixin, ImmobBaseModel):
 
 
 
-class UserPropertyPermission(ImmobBaseModel):
-    """Permissions granulaires par propriété/bâtiment"""
+class UserBuildingPermission(ImmobBaseModel):
+    """Permissions granulaires par bâtiment"""
     
+    class PermissionLevel(models.TextChoices):
+        VIEW = 'VIEW', _('View')
+        CREATE = 'CREATE', _('Create')
+        UPDATE = 'UPDATE', _('Update')
+        DELETE = 'DELETE', _('Delete')
+
     user = models.ForeignKey(
         ImmobUser,
         on_delete=models.CASCADE,
-        related_name='property_permissions'
+        related_name='user_building_permissions'
     )
     building = models.ForeignKey(
         'holdings.Building',
@@ -132,19 +138,13 @@ class UserPropertyPermission(ImmobBaseModel):
         blank=True,
         related_name='user_permissions'
     )
-    property = models.ForeignKey(
-        'holdings.Property',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='user_permissions'
+
+    # Permissions 
+    permission_level = models.CharField(
+        max_length=10,
+        choices=PermissionLevel.choices,
+        default=PermissionLevel.VIEW
     )
-    
-    # Permissions CRUD
-    can_view = models.BooleanField(default=True)
-    can_create = models.BooleanField(default=False)
-    can_update = models.BooleanField(default=False)
-    can_delete = models.BooleanField(default=False)
     
     granted_by = models.ForeignKey(
         ImmobUser,
@@ -156,18 +156,17 @@ class UserPropertyPermission(ImmobBaseModel):
     expires_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = 'immob_user_property_permissions'
-        verbose_name = _('User Property Permission')
-        verbose_name_plural = _('User Property Permissions')
-        unique_together = [['user', 'building', 'property']]
+        db_table = 'immob_user_building_permissions'
+        verbose_name = _('User Building Permission')
+        verbose_name_plural = _('User Building Permissions')
+        unique_together = [['user', 'building']]
         indexes = [
             models.Index(fields=['user', 'expires_at']),
             models.Index(fields=['building', 'user']),
-            models.Index(fields=['property', 'user']),
         ]
 
     def __str__(self):
-        scope = self.property or self.building or "Global"
+        scope = self.building
         return f"{self.user.email} - {scope}"
 
     def is_valid(self):
@@ -176,19 +175,6 @@ class UserPropertyPermission(ImmobBaseModel):
         if self.expires_at and self.expires_at < timezone.now():
             return False
         return True
-
-    def has_access(self, action):
-        """Vérifie l'accès pour une action spécifique"""
-        if not self.is_valid():
-            return False
-        
-        action_map = {
-            'view': self.can_view,
-            'create': self.can_create,
-            'update': self.can_update,
-            'delete': self.can_delete,
-        }
-        return action_map.get(action, False)
 
     def is_expired(self):
         """Vérifie si la permission a expiré"""
