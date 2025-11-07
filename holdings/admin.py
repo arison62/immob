@@ -3,7 +3,7 @@ from .models import Property, Building, PropertyPhoto, MaintenanceLog
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'workspace', 'address', 'floor_count')
+    list_display = ('name', 'workspace', 'floor_count')
 
 
 @admin.register(Property)

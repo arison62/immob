@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from pydantic import ValidationError
-from accounts.dtos import UserCreateDTO, UserUpdateDTO
+from accounts.services.dtos import UserCreateDTO, UserUpdateDTO
 from accounts.services.team_service import team_service
 from core.utils import format_pydantic_errors
 import json

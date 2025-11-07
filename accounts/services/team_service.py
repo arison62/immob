@@ -1,5 +1,5 @@
 from accounts.models import ImmobUser
-from accounts.dtos import UserCreateDTO, UserUpdateDTO
+from accounts.services.dtos import UserCreateDTO, UserUpdateDTO
 from core.services.audit_log_service import AuditLogService
 from core.models import AuditLog
 from django.db import transaction

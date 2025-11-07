@@ -2,24 +2,24 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from .models import Contract, Payment
+from .models import Contrat, Payment
 from holdings.models import Property
 
 
-@receiver(post_save, sender=Contract)
-def update_property_status_on_contract_save(sender, instance, created, **kwargs):
+@receiver(post_save, sender=Contrat)
+def update_property_status_on_contrat_save(sender, instance, created, **kwargs):
     """Met à jour le statut de la propriété lors de la sauvegarde d'un contrat"""
-    if instance.status == Contract.ContractStatus.ACTIVE:
+    if instance.status == Contrat.ContratStatus.ACTIVE:
         instance.property.status = Property.PropertyStatus.OCCUPIED
         instance.property.save()
-    elif instance.status in [Contract.ContractStatus.TERMINATED, Contract.ContractStatus.EXPIRED]:
+    elif instance.status in [Contrat.ContratStatus.TERMINATED, Contrat.ContratStatus.EXPIRED]:
         # Vérifier s'il n'y a pas d'autre contrat actif
-        active_contracts = Contract.objects.filter(
+        active_contrats = Contrat.objects.filter(
             property=instance.property,
-            status=Contract.ContractStatus.ACTIVE
+            status=Contrat.ContratStatus.ACTIVE
         ).exclude(id=instance.id).exists()
         
-        if not active_contracts:
+        if not active_contrats:
             instance.property.status = Property.PropertyStatus.AVAILABLE
             instance.property.save()
 

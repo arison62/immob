@@ -62,23 +62,23 @@ class Tenant(SoftDeletedModelMixin, ImmobBaseModel):
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
 
-    def get_active_contracts(self):
+    def get_active_contrats(self):
         """Retourne les contrats actifs du locataire"""
-        return self.tenant_contracts.filter(
-            status=Contract.ContractStatus.ACTIVE,
+        return self.tenant_contrats.filter( # type: ignore
+            status=Contrat.ContratStatus.ACTIVE,
             end_date__gte=timezone.now().date(),
             is_deleted=False
         )
 
     def get_history(self):
         """Retourne l'historique des contrats du locataire"""
-        return self.tenant_contracts.filter(is_deleted=False).order_by('-start_date')
+        return self.tenant_contrats.filter(is_deleted=False).order_by('-start_date') # type: ignore
 
 
-class Contract(SoftDeletedModelMixin, ImmobBaseModel):
+class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
     """Contrat de location"""
     
-    class ContractStatus(models.TextChoices):
+    class ContratStatus(models.TextChoices):
         DRAFT = 'DRAFT', _('Draft')
         ACTIVE = 'ACTIVE', _('Active')
         EXPIRED = 'EXPIRED', _('Expired')
@@ -91,35 +91,35 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
     workspace = models.ForeignKey(
         "accounts.Workspace",
         on_delete=models.CASCADE,
-        related_name='contracts'
+        related_name='contrats'
     )
     property = models.ForeignKey(
         "holdings.Property",
         on_delete=models.PROTECT,
-        related_name='property_contracts'
+        related_name='property_contrats'
     )
     tenant = models.ForeignKey(
         Tenant,
         on_delete=models.PROTECT,
-        related_name='tenant_contracts'
+        related_name='tenant_contrats'
     )
     created_by = models.ForeignKey(
         "accounts.ImmobUser",
         on_delete=models.SET_NULL,
         null=True,
-        related_name='created_contracts'
+        related_name='created_contrats'
     )
     updated_by = models.ForeignKey(
         "accounts.ImmobUser",
         on_delete=models.SET_NULL,
         null=True,
-        related_name='updated_contracts'
+        related_name='updated_contrats'
     )
     
-    contract_number = models.CharField(
+    contrat_number = models.CharField(
         max_length=50,
         unique=True,
-        verbose_name=_('Contract number'),
+        verbose_name=_('Contrat number'),
         db_index=True
     )
     
@@ -165,14 +165,14 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
     )
     status = models.CharField(
         max_length=20,
-        choices=ContractStatus.choices,
-        default=ContractStatus.DRAFT,
+        choices=ContratStatus.choices,
+        default=ContratStatus.DRAFT,
         verbose_name=_('Status'),
         db_index=True
     )
     
     terms = models.TextField(
-        verbose_name=_('Contract terms'),
+        verbose_name=_('Contrat terms'),
         null=True,
         blank=True
     )
@@ -181,9 +181,9 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
     all_objects = models.Manager()
 
     class Meta:
-        db_table = 'immob_contracts'
-        verbose_name = _('Contract')
-        verbose_name_plural = _('Contracts')
+        db_table = 'immob_contrats'
+        verbose_name = _('Contrat')
+        verbose_name_plural = _('Contrats')
         indexes = [
             models.Index(fields=['property', 'status']),
             models.Index(fields=['tenant', 'status']),
@@ -192,12 +192,12 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
         ]
 
     def __str__(self):
-        return f"{self.contract_number} - {self.tenant}"
+        return f"{self.contrat_number} - {self.tenant}"
 
     def activate(self):
         """Active le contrat"""
         
-        self.status = self.ContractStatus.ACTIVE
+        self.status = self.ContratStatus.ACTIVE
         from holdings.models import Property
         self.property.change_status(Property.PropertyStatus.OCCUPIED)
         self.save()
@@ -205,7 +205,7 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
 
     def terminate(self):
         """Termine le contrat"""
-        self.status = self.ContractStatus.TERMINATED
+        self.status = self.ContratStatus.TERMINATED
         from holdings.models import Property
         self.property.change_status(Property.PropertyStatus.AVAILABLE)
         self.save()
@@ -213,7 +213,7 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
     def is_active(self):
         """Vérifie si le contrat est actif"""
         return (
-            self.status == self.ContractStatus.ACTIVE and
+            self.status == self.ContratStatus.ACTIVE and
             self.start_date <= timezone.now().date() <= self.end_date
         )
 
@@ -221,7 +221,7 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
         """Génère les paiements pour le contrat"""
         from dateutil.relativedelta import relativedelta
         
-        if self.status != self.ContractStatus.ACTIVE:
+        if self.status != self.ContratStatus.ACTIVE:
             return
         
         current_date = self.start_date
@@ -229,12 +229,12 @@ class Contract(SoftDeletedModelMixin, ImmobBaseModel):
         
         while current_date <= self.end_date:
             Payment.objects.get_or_create(
-                contract=self,
+                contrat=self,
                 due_date=current_date,
                 defaults={
                     'amount': self.monthly_rent + self.charges,
                     'status': Payment.PaymentStatus.PENDING,
-                    'reference_number': f"{self.contract_number}-{payment_number:03d}",
+                    'reference_number': f"{self.contrat_number}-{payment_number:03d}",
                     'created_by': self.created_by
                 }
             )
@@ -269,10 +269,10 @@ class Payment(ImmobBaseModel):
         CHECK = 'CHECK', _('Check')
         CARD = 'CARD', _('Card')
 
-    contract = models.ForeignKey(
-        Contract,
+    contrat = models.ForeignKey(
+        Contrat,
         on_delete=models.PROTECT,
-        related_name='contract_payments'
+        related_name='contrat_payments'
     )
     amount = models.DecimalField(
         max_digits=10,
@@ -318,7 +318,7 @@ class Payment(ImmobBaseModel):
         verbose_name = _('Payment')
         verbose_name_plural = _('Payments')
         indexes = [
-            models.Index(fields=['contract', 'due_date']),
+            models.Index(fields=['contrat', 'due_date']),
             models.Index(fields=['status', 'due_date']),
             models.Index(fields=['reference_number']),
         ]

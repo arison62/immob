@@ -100,7 +100,7 @@ classDiagram
         -DateTime updated_at
         +isAvailable() Boolean
         +changeStatus(new_status) void
-        +hasActiveContract() Boolean
+        +hasActiveContrat() Boolean
     }
 
     class PropertyType {
@@ -133,26 +133,26 @@ classDiagram
         -String emergency_contact_phone
         -DateTime created_at
         -Decimal outstanding_balance  %% ADDED: Quick financial summary
-        +getActiveContracts() Collection~Contract~
-        +getHistory() Collection~Contract~
+        +getActiveContrats() Collection~Contrat~
+        +getHistory() Collection~Contrat~
         +calculateBalance() Decimal  %% ADDED: To compute from payments
     }
 
-    class Contract {
+    class Contrat {
         <<entity>>
         -UUID id
         -UUID property_id
         -UUID tenant_id
         -UUID workspace_id  %% ADDED: Direct scoping for queries/finances
         -UUID created_by
-        -String contract_number
+        -String contrat_number
         -Date start_date
         -Date end_date
         -Decimal monthly_rent
         -Decimal security_deposit
         -Decimal charges
         -PaymentFrequency payment_frequency
-        -ContractStatus status
+        -ContratStatus status
         -JSON terms  %% CHANGED: From String to JSON for structured clauses
         -DateTime signature_date
         -DateTime created_at
@@ -173,7 +173,7 @@ classDiagram
         ANNUALLY
     }
 
-    class ContractStatus {
+    class ContratStatus {
         <<enumeration>>
         DRAFT
         ACTIVE
@@ -184,7 +184,7 @@ classDiagram
     class Payment {
         <<entity>>
         -UUID id
-        -UUID contract_id
+        -UUID contrat_id
         -Decimal amount
         -Date due_date
         -DateTime payment_date
@@ -222,7 +222,7 @@ classDiagram
     class Invoice {
         <<entity>>
         -UUID id
-        -UUID payment_id  %% Or contract_id if contract-level
+        -UUID payment_id  %% Or contrat_id if contrat-level
         -String invoice_number
         -Date issue_date
         -Decimal total_amount
@@ -252,21 +252,21 @@ classDiagram
     Workspace "1" -- "0..*" Building : contains
     Workspace "1" -- "0..*" Property : contains
     Workspace "1" -- "0..*" Tenant : manages  %% ADDED
-    Workspace "1" -- "0..*" Contract : manages  %% ADDED
+    Workspace "1" -- "0..*" Contrat : manages  %% ADDED
     
     Building "0..1" -- "0..*" Property : contains
     
     Property "1" -- "1" PropertyType : is
     Property "1" -- "1" PropertyStatus : has
-    Property "1" -- "0..*" Contract : rented_by
+    Property "1" -- "0..*" Contrat : rented_by
     Property "1" -- "0..*" PropertyPhoto : has
     Property "1" -- "0..*" MaintenanceLog : maintenance_history
     
-    Tenant "1" -- "0..*" Contract : signs
+    Tenant "1" -- "0..*" Contrat : signs
     
-    Contract "1" -- "1" ContractStatus : has
-    Contract "1" -- "1" PaymentFrequency : uses
-    Contract "1" -- "0..*" Payment : generates
+    Contrat "1" -- "1" ContratStatus : has
+    Contrat "1" -- "1" PaymentFrequency : uses
+    Contrat "1" -- "0..*" Payment : generates
     
     Payment "1" -- "1" PaymentStatus : has
     Payment "1" -- "1" PaymentMethod : paid_with
@@ -280,8 +280,8 @@ classDiagram
     
     %% Notes de sécurité (updated)
     note for User "Secure authentication\npassword_hash with bcrypt/Argon2\nSession management"
-    note for UserBuildingPermission "Granular access control\nAutomatic expiration\nMandatory audit\nExtend to Tenant/Contract if needed"
+    note for UserBuildingPermission "Granular access control\nAutomatic expiration\nMandatory audit\nExtend to Tenant/Contrat if needed"
     note for Tenant "Sensitive data encrypted\nid_number encrypted\nGDPR compliant\nFinancial fields read-only for viewers"
     note for AuditLog "Complete traceability\n2 years minimum retention\nDenied access attempts logged\nLog all financial changes"
-    note for Contract "Encrypt financial details\nTrack amendments in AuditLog"
+    note for Contrat "Encrypt financial details\nTrack amendments in AuditLog"
     note for Payment "Encrypt reference_number\nAutomate late fees in business logic"

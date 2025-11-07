@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from decimal import Decimal
 from django.utils import timezone
 
-from finance.models import Contract
+from finance.models import Contrat
 from core.models import SoftDeletedModelMixin, ImmobBaseModel, ImmobDefaultManager
 
 class Building(SoftDeletedModelMixin, ImmobBaseModel):
@@ -18,9 +18,9 @@ class Building(SoftDeletedModelMixin, ImmobBaseModel):
         related_name='buildings'
     )
     name = models.CharField(max_length=255, verbose_name=_('Building name'))
-    address = models.CharField(max_length=500, verbose_name=_('Address'))
+    street = models.CharField(max_length=255, verbose_name=_('Street'))
     city = models.CharField(max_length=100, verbose_name=_('City'), db_index=True)
-    postal_code = models.CharField(max_length=20, verbose_name=_('Postal code'))
+    postal_code = models.CharField(max_length=20, verbose_name=_('Postal code'), null=True, blank=True)
     country = models.CharField(max_length=100, default='Cameroun', verbose_name=_('Country'))
     
     # Coordonnées GPS
@@ -59,14 +59,14 @@ class Building(SoftDeletedModelMixin, ImmobBaseModel):
 
     def get_property_count(self):
         """Retourne le nombre total de propriétés"""
-        return self.building_properties.filter(is_deleted=False).count()
+        return self.building_properties.filter(is_deleted=False).count() # type: ignore
 
     def get_occupied_property_count(self):
         """Retourne le nombre de propriétés occupées"""
-        return self.building_properties.filter(
+        return self.building_properties.filter( # type: ignore
             is_deleted=False,
             status=Property.PropertyStatus.OCCUPIED
-        ).count()
+        ).count() 
 
 
 class Property(SoftDeletedModelMixin, ImmobBaseModel):
@@ -190,10 +190,10 @@ class Property(SoftDeletedModelMixin, ImmobBaseModel):
             self.status = new_status
             self.save()
 
-    def has_active_contract(self):
+    def has_active_contrat(self):
         """Vérifie si la propriété a un contrat actif"""
-        return self.property_contracts.filter(
-            status=Contract.ContractStatus.ACTIVE,
+        return self.property_contrats.filter( # type: ignore
+            status=Contrat.ContratStatus.ACTIVE,
             end_date__gte=timezone.now().date()
         ).exists()
 
@@ -210,7 +210,6 @@ class PropertyPhoto(ImmobBaseModel):
         upload_to='properties/%Y/%m/',
         verbose_name=_('Photo')
     )
-    file_name = models.CharField(max_length=255, verbose_name=_('File name'))
     is_primary = models.BooleanField(default=False, verbose_name=_('Primary photo'))
     display_order = models.PositiveIntegerField(default=0, verbose_name=_('Display order'))
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -226,7 +225,7 @@ class PropertyPhoto(ImmobBaseModel):
         ]
 
     def __str__(self):
-        return f"Photo {self.property.reference_code} - {self.file_name}"
+        return f"Photo {self.property.reference_code} - {self.display_order}"
 
     def set_as_primary(self):
         """Définit cette photo comme photo principale"""
@@ -325,7 +324,7 @@ class MaintenanceLog(SoftDeletedModelMixin, ImmobBaseModel):
         ]
 
     def __str__(self):
-        return f"{self.property_maintenance_logs.first().reference_code or self.building_maintenance_logs.first().name} - {self.get_type_display()} - {self.scheduled_date}"
+        return f"{self.property_maintenance_logs.first().reference_code or self.building_maintenance_logs.first().name} - {self.get_type_display()} - {self.scheduled_date}" # type: ignore
 
     def complete(self, cost=None):
         """Marque la maintenance comme complétée"""

@@ -142,10 +142,16 @@ class UserBuildingPermission(ImmobBaseModel):
     # Permissions 
     permission_level = models.CharField(
         max_length=10,
+        verbose_name=_('Permission level'),
         choices=PermissionLevel.choices,
-        default=PermissionLevel.VIEW
+        default=PermissionLevel.VIEW,
     )
-    
+
+    permission_level_score = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_('Permission level score'),
+        help_text= "Score numerique du niveau de permission pour faciliter les requetes"
+        )
     granted_by = models.ForeignKey(
         ImmobUser,
         on_delete=models.CASCADE,
@@ -155,6 +161,16 @@ class UserBuildingPermission(ImmobBaseModel):
     granted_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        SCORE_MAPPING = {
+            self.PermissionLevel.VIEW: 1,
+            self.PermissionLevel.CREATE: 2,
+            self.PermissionLevel.UPDATE: 3,
+            self.PermissionLevel.DELETE: 4,
+        }
+        self.permission_level_score = SCORE_MAPPING.get(self.PermissionLevel[self.permission_level], 1) 
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'immob_user_building_permissions'
         verbose_name = _('User Building Permission')
@@ -162,6 +178,7 @@ class UserBuildingPermission(ImmobBaseModel):
         unique_together = [['user', 'building']]
         indexes = [
             models.Index(fields=['user', 'expires_at']),
+            models.Index(fields=['user', 'permission_level']),
             models.Index(fields=['building', 'user']),
         ]
 
