@@ -4,6 +4,7 @@ from .dtos import AddressUpdateDTO, BuildingCreateDTO, BuildingUpdateDTO, Addres
 from core.services.audit_log_service import AuditLogService, AuditLog
 from django.db import transaction
 from django.db.models.query import QuerySet
+from django.db.models import OuterRef, Subquery, CharField, IntegerField, Value, Case, When
 from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -183,28 +184,75 @@ class BuildingService:
 
         return building_to_update
 
-    def list_buildings_for_user(self, acting_user: ImmobUser) -> QuerySet[Building]:
+    def list_buildings_for_user(self, acting_user: ImmobUser):
         """
         Retourne la liste des Buildings auxquels l'utilisateur a accès.
         Implémente le filtrage par périmètre.
         """
         
-        # 1. Règle: L'OWNER voit tout
         if acting_user.role == ImmobUser.UserRole.OWNER:
-            return Building.objects.all().prefetch_related('user_permissions', 'properties')
+            return Building.objects.all().annotate(
+                user_best_permission=Value(
+                    str(UserBuildingPermission.PermissionLevel.DELETE),
+                    output_field=CharField()
+                )
+            ).values(
+                'id', 
+                'name', 
+                'user_best_permission',
+                'street',
+                'city', 
+                'postal_code', 
+                'country', 
+                'latitude', 
+                'longitude',
+                'floor_count',
+                'description'
+            )
         
-        # 2. Règle: MANAGER/VIEWER ont un périmètre (scope)
-        # On filtre les Buildings qui ont une permission VIEW valide (score >= 1) pour cet utilisateur
-        
-        building_ids = UserBuildingPermission.objects.filter(
+        valid_user_permissions = UserBuildingPermission.objects.filter(
             user=acting_user,
-            # Le score minimum pour pouvoir LISTER est VIEW (score 1)
-            permission_level_score__gte=SCORE_MAPPING[UserBuildingPermission.PermissionLevel.VIEW]
+            building=OuterRef('pk')
         ).filter(
             Q(expires_at__isnull=True) | Q(expires_at__gte=timezone.now())
-        ).values_list('building_id', flat=True).distinct()
+        ).order_by('-permission_level_score')
         
-        return Building.objects.filter(
-            id__in=building_ids,
-            is_deleted=False
-        ).prefetch_related('user_permissions', 'properties')
+        single_score_subquery = valid_user_permissions.values('permission_level_score')[:1]
+        
+        SCORE_TO_PERMISSION_MAP = {v: k for k, v in SCORE_MAPPING.items()}
+        permission_case = Case(
+            *[
+                When(user_best_score=score, then=Value(permission_str))
+                for score, permission_str in SCORE_TO_PERMISSION_MAP.items()
+            ],
+            default=Value('none'),
+            output_field=CharField()
+        )
+        
+        buildings_qs = Building.objects.filter(
+            id__in=valid_user_permissions.values('building')
+        ).distinct().annotate(
+           user_best_score=Subquery(
+               single_score_subquery, output_field=IntegerField()
+           )
+        )
+        
+        buildings_qs = buildings_qs.annotate(
+            user_best_permission=permission_case
+        ).values(
+            'id', 
+            'name', 
+            'user_best_permission',
+            'street',
+            'city', 
+            'postal_code', 
+            'country', 
+            'latitude', 
+            'longitude',
+            'floor_count',
+            'description'
+        )
+        
+        return buildings_qs
+
+building_service = BuildingService()

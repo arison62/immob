@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "debug_toolbar",
     
     "django_vite",
     "inertia",
@@ -69,7 +70,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "inertia.middleware.InertiaMiddleware",
-    
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "immob.middleware.DataShareMiddleware",
     "immob.middleware.UserAuthMiddleware",
 ]
@@ -166,6 +167,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 # Name of static files folder (after called python manage.py collectstatic)
 STATIC_ROOT = BASE_DIR / "static"
+
+# Debug toolbar settings
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # If use HMR or not.
 DJANGO_VITE = {

@@ -32,7 +32,7 @@ class BuildingUpdateDTO(BaseModel):
     floor_count : Optional[int] = None
 
 class PropertyCreateDTO(BaseModel):
-    building_id: Optional[UUID] = None
+    building_id: UUID
     name: str = Field(..., max_length=255)
     type: str = Field(..., max_length=20)
     status: Optional[str] = Field('AVAILABLE', max_length=20)
