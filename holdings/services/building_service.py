@@ -96,10 +96,10 @@ class BuildingService:
             raise PermissionError("Accès refusé. Seul un Owner est autorisé à créer un nouveau bâtiment.")
         
         data_to_create = building_data.model_dump(exclude_none=True)
-        address_dto: AddressDTO = data_to_create.pop('address')
+        address_dto: AddressDTO = building_data.address
         
         address_fields = address_dto.model_dump(exclude_none=True)
-        
+        data_to_create.pop("address")
         # Ajout des champs d'adresse + des placeholders pour la géolocalisation
         data_to_create = {
             **data_to_create, 
@@ -108,9 +108,9 @@ class BuildingService:
             'longitude': None
         }
 
-       
+  
         building = Building.objects.create(
-            created_by=acting_user,
+            workspace = acting_user.workspace,
             **data_to_create
         )
 

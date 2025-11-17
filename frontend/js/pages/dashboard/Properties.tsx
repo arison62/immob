@@ -1,9 +1,30 @@
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import DashboardLayout from "./DashboardLayout";
-import type { ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
+import  { DataTable as PropertyTable } from "./Properties/components/property-table";
+import  { DataTable as BuildingTable } from "./Properties/components/building-table";
+import { columns as columnsProperty } from "./Properties/components/columns-property";
+import { columns as columnsBuilding } from "./Properties/components/columns-building";
+import { usePage } from "@inertiajs/react";
+import { usePropertyStore, type Property, type Building } from "./Properties/property-store";
 
 
 function Properties() {
+  const page = usePage();
+  const initialProperties = useMemo(() => (page.props.properties as Property[]) || [], [page.props.properties]);
+  const initialBuildings = useMemo(() => (page.props.buildings as Building[]) || [], [page.props.buildings]);
+  const initializeProperties = usePropertyStore((state) => state.initializeProperties);
+  const initializeBuildings = usePropertyStore((state) => state.initializeBuildings);
+  const properties = usePropertyStore((state) => state.properties);
+  const buildings = usePropertyStore((state) => state.buildings);
+
+  useEffect(() => {
+    initializeProperties(initialProperties as Property[]);
+  }, [initialProperties, initializeProperties]);
+
+  useEffect(() => {
+    initializeBuildings(initialBuildings as Building[]);
+  }, [initialBuildings, initializeBuildings]);  
   return (
     <div className="h-full flex-1 flex-col gap-8 p-8 md:flex">
       <div className="flex items-center justify-between gap-2">
@@ -20,10 +41,10 @@ function Properties() {
           <TabsTrigger value="building">Immeubles</TabsTrigger>
         </TabsList>
         <TabsContent value="property">
-          {/* Contenu des propriétés */}
+          <PropertyTable data={properties} columns={columnsProperty} />
         </TabsContent>
         <TabsContent value="building">
-          {/* Contenu des immeubles */}
+          <BuildingTable data={buildings} columns={columnsBuilding} />
         </TabsContent>
       </Tabs>
     </div>

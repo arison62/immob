@@ -24,6 +24,7 @@ class LockoutAuthBackend(ModelBackend):
         
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
+          
         except UserModel.DoesNotExist:
             return None 
 
