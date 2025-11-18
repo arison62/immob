@@ -35,6 +35,7 @@ class PropertiesView(LoginRequiredMixin, View):
         try:
             data = self._parse_request_data(request)
             form_type = data.get("formType")
+            print(data)
             if form_type == "building":
                 building_dto = BuildingCreateDTO.model_validate(data)
                 new_building = building_service.create_building(

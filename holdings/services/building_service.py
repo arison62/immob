@@ -87,39 +87,80 @@ class BuildingService:
     @transaction.atomic
     def create_building(self, acting_user: ImmobUser, building_data: BuildingCreateDTO, request=None) -> Building:
         """
-        Crée un nouveau Building (réservé aux Owners).
+        Crée un nouveau Building (réservé aux Owners) et les permissions associées.
         """
-        
-       
+
+        # 1. CONTRÔLE DE RÔLE
         if acting_user.role != ImmobUser.UserRole.OWNER:
-            self._log_access_denied(acting_user, UUID(int=0), request) 
+            self._log_access_denied(acting_user, UUID(int=0), request)
             raise PermissionError("Accès refusé. Seul un Owner est autorisé à créer un nouveau bâtiment.")
+
+        # 2. PRÉPARATION DES DONNÉES DU BÂTIMENT
+        data_for_creation = building_data.model_dump(exclude_none=True)
         
-        data_to_create = building_data.model_dump(exclude_none=True)
-        address_dto: AddressDTO = building_data.address
-        
+        # Sépare l'adresse et les permissions du reste des champs
+        address_dto = building_data.address
+        # Récupère le tableau de permissions (peut être vide ou None)
+        permissions_data = data_for_creation.pop("permissions", []) 
+
+        # Prépare les champs pour la création du Building
         address_fields = address_dto.model_dump(exclude_none=True)
-        data_to_create.pop("address")
-        # Ajout des champs d'adresse + des placeholders pour la géolocalisation
-        data_to_create = {
-            **data_to_create, 
-            **address_fields, 
+        data_for_creation.pop("address") # Supprime la clé 'address' de niveau supérieur
+
+        building_fields = {
+            **data_for_creation,
+            **address_fields,
             'latitude': None, 
-            'longitude': None
+            'longitude': None,
+            
         }
 
-  
+        # 3. CRÉATION DU BÂTIMENT
         building = Building.objects.create(
-            workspace = acting_user.workspace,
-            **data_to_create
+            **building_fields,
+            workspace=acting_user.workspace
         )
+        
+        # 4. CRÉATION DES PERMISSIONS (si fournies)
+        if permissions_data:
+            
+            # 4.1 Récupérer tous les ImmobUser en une seule requête (Batch fetch)
+            user_ids = [p['user_id'] for p in permissions_data]
+            # users_map: {UUID: ImmobUser instance}
+            users_map = ImmobUser.objects.in_bulk(user_ids) 
+            
+            permissions_to_create = []
+            
+            for perm_data in permissions_data:
+                user_id = perm_data['user_id']
+                permission_name = perm_data['permission_name']
+                
+                user_instance = users_map.get(user_id)
+                
+                if not user_instance:
+                     # Ignore les IDs d'utilisateur qui n'existent pas
+                     continue 
+                
+                permissions_to_create.append(
+                    UserBuildingPermission(
+                        user=user_instance,
+                        building=building,
+                        permission_level=permission_name,
+                        granted_by=acting_user,
+                    )
+                )
 
+            # 4.3 Sauvegarde en masse
+            if permissions_to_create:
+                UserBuildingPermission.objects.bulk_create(permissions_to_create)
+
+        # 5. AUDIT LOG
         AuditLogService.log_action(
             user=acting_user,
             action=AuditLog.AuditAction.CREATE,
             entity_type='Building',
             entity_id=str(building.id),
-            new_values=data_to_create,
+            new_values=building_fields,
             request=request,
         )
 

@@ -7,10 +7,13 @@ class AddressDTO(BaseModel):
     """Sous-modèle pour l'adresse."""
     street: str = Field(..., max_length=255)
     number: Optional[str] = Field(None, max_length=10)
-    postal_code: Optional[str] = Field(..., max_length=10)
+    postal_code: Optional[str] = Field(None, max_length=10)
     city: str = Field(..., max_length=100)
     country: str = Field(..., max_length=100)
-    
+
+class BuildingPermission(BaseModel):
+    user_id: UUID
+    permission_name: str
 
 class AddressUpdateDTO(BaseModel):
     street: Optional[str] = Field(None, max_length=255)
@@ -24,6 +27,7 @@ class BuildingCreateDTO(BaseModel):
     address: AddressDTO 
     description: Optional[str] = None
     floor_count : Optional[int] = None
+    permissions: Optional[list[BuildingPermission]]
 
 class BuildingUpdateDTO(BaseModel):
     name: Optional[str] = Field(None, max_length=255)

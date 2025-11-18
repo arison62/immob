@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableViewOptions } from "../../components/data-table-view-options";
 
 import { usePropertyStore } from "../property-store";
-import BuildingForm from "./building_form";
+import BuildingForm from "./building-form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -58,7 +58,7 @@ export function DataTableToolbar<TData>({
           <DialogTrigger asChild>
             <Button size="sm" onClick={clearSelection}>Ajouter un batiment</Button>
           </DialogTrigger>
-          <DialogContent className="">
+          <DialogContent className="min-w-fit">
             <BuildingForm />
           </DialogContent>
         </Dialog>

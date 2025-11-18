@@ -1,18 +1,11 @@
 import DashboardLayout from "./DashboardLayout";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { DataTable } from "./components/data-table";
 import { columns } from "./Teams/components/columns";
-import { usePage } from "@inertiajs/react";
-import { useTeamStore, type User} from "./Teams/team-store";
+import { useTeamStore} from "../../store/team-store";
 
 function Teams() {
-  const page = usePage();
-  const initialUsers = useMemo(() => (page.props.users as User[]) || [], [page.props.users]);
-  const initializeUsers = useTeamStore((state) => state.initializeUsers);
   const users = useTeamStore((state) => state.users);
-  useEffect(() => {
-    initializeUsers(initialUsers as User[]);
-  }, [initialUsers, initializeUsers]);
 
   return (
     <div className="h-full flex-1 flex-col gap-8 p-8 md:flex">

@@ -17,13 +17,14 @@ import {
   FieldLegend,
   FieldDescription,
 } from "@/components/ui/field";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useForm } from "@inertiajs/react";
 import { useEffect, type FormEvent } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useTeamStore, type User } from "../team-store";
+import { useTeamStore, type User } from "../../../../store/team-store";
 
 type UserFormData = {
   id?: string;
@@ -93,19 +94,19 @@ export default function UserCreationForm() {
       except: ["users"],
       onSuccess: ({ props }) => {
         const updatedOrNewUser = props.user as User;
-        console.log("Props user : ", updatedOrNewUser)
+        
         if (isEditing) {
           updateUser(updatedOrNewUser);
         } else {
           addUser(updatedOrNewUser);
         }
         clearSelection();
-        clearErrors()
+        clearErrors();
         reset("password", "password_confirmation");
       },
-      onError: (err)=>{
-        console.log("Error : ", err)
-      }
+      onError: (err) => {
+        console.log("Error : ", err);
+      },
     });
   };
 
@@ -119,156 +120,188 @@ export default function UserCreationForm() {
   return (
     <Card className="shadow-none border-none">
       <CardHeader>
-        <CardTitle>Créer un nouvel utilisateur</CardTitle>
+        <CardTitle>
+          {isEditing ? "Modifier l'utilisateur" : "Créer un nouvel utilisateur"}
+        </CardTitle>
       </CardHeader>
       <form onSubmit={submit}>
-        <CardContent className="space-y-6">
-          <FieldGroup>
-            {/* Champ Prénom */}
-            <Field orientation="responsive" data-invalid={!!errors.first_name}>
-              <FieldLabel htmlFor="first_name">Prénom</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="first_name"
-                  type="text"
-                  value={data.first_name}
-                  onChange={(e) => setData("first_name", e.target.value)}
-                  autoComplete="given-name"
-                  disabled={processing}
-                />
-                <FieldError>{errors.first_name}</FieldError>
-              </FieldContent>
-            </Field>
+        <CardContent>
+          <Tabs defaultValue="informations" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="informations">
+                Informations personnelles
+              </TabsTrigger>
+              <TabsTrigger value="securite">Sécurité et accès</TabsTrigger>
+            </TabsList>
 
-            {/* Champ Nom */}
-            <Field orientation="responsive" data-invalid={!!errors.last_name}>
-              <FieldLabel htmlFor="last_name">Nom</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="last_name"
-                  type="text"
-                  value={data.last_name}
-                  onChange={(e) => setData("last_name", e.target.value)}
-                  autoComplete="family-name"
-                  disabled={processing}
-                />
-                <FieldError>{errors.last_name}</FieldError>
-              </FieldContent>
-            </Field>
-
-            {/* Champ Email */}
-            <Field orientation="responsive" data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => setData("email", e.target.value)}
-                  autoComplete="email"
-                  disabled={processing}
-                />
-                <FieldError>{errors.email}</FieldError>
-              </FieldContent>
-            </Field>
-
-            {/* Champ Téléphone */}
-            <Field orientation="responsive" data-invalid={!!errors.phone}>
-              <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
-              <FieldContent>
-                <Input
-                  id="phone"
-                  type="text"
-                  value={data.phone}
-                  onChange={(e) => setData("phone", e.target.value)}
-                  autoComplete="tel"
-                  disabled={processing}
-                />
-                <FieldError>{errors.phone}</FieldError>
-              </FieldContent>
-            </Field>
-
-            {/* Champ Rôle */}
-            <Field orientation="responsive" data-invalid={!!errors.role}>
-              <FieldLabel htmlFor="role">Rôle d'accès</FieldLabel>
-              <FieldContent>
-                <Select
-                  value={data.role}
-                  onValueChange={(value) => setData("role", value)}
-                  disabled={processing}
-                >
-                  <SelectTrigger id="role" className="w-full">
-                    <SelectValue placeholder="Sélectionnez un rôle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {USER_ROLES.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldDescription>
-                  Définit le niveau d'accès de l'utilisateur.
-                </FieldDescription>
-                <FieldError>{errors.role}</FieldError>
-              </FieldContent>
-            </Field>
-          </FieldGroup>
-
-          {/* Section Mot de Passe */}
-          {!isEditing && (
-            <FieldSet>
-              <FieldLegend>Définir le mot de passe</FieldLegend>
+            {/* Onglet Informations personnelles */}
+            <TabsContent value="informations" className="space-y-4 pt-4">
               <FieldGroup>
+                {/* Champ Prénom */}
                 <Field
                   orientation="responsive"
-                  data-invalid={!!errors.password}
+                  data-invalid={!!errors.first_name}
                 >
-                  <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+                  <FieldLabel htmlFor="first_name">Prénom</FieldLabel>
                   <FieldContent>
                     <Input
-                      id="password"
-                      type="password"
-                      value={data.password}
-                      onChange={(e) => setData("password", e.target.value)}
-                      autoComplete="new-password"
+                      id="first_name"
+                      type="text"
+                      value={data.first_name}
+                      onChange={(e) => setData("first_name", e.target.value)}
+                      autoComplete="given-name"
                       disabled={processing}
                     />
-                    <FieldError>{errors.password}</FieldError>
+                    <FieldError>{errors.first_name}</FieldError>
                   </FieldContent>
                 </Field>
 
+                {/* Champ Nom */}
                 <Field
                   orientation="responsive"
-                  data-invalid={!!errors.password_confirmation}
+                  data-invalid={!!errors.last_name}
                 >
-                  <FieldLabel htmlFor="password_confirmation">
-                    Confirmer mot de passe
-                  </FieldLabel>
+                  <FieldLabel htmlFor="last_name">Nom</FieldLabel>
                   <FieldContent>
                     <Input
-                      id="password_confirmation"
-                      type="password"
-                      value={data.password_confirmation}
-                      onChange={(e) =>
-                        setData("password_confirmation", e.target.value)
-                      }
-                      autoComplete="new-password"
+                      id="last_name"
+                      type="text"
+                      value={data.last_name}
+                      onChange={(e) => setData("last_name", e.target.value)}
+                      autoComplete="family-name"
                       disabled={processing}
                     />
-                    <FieldError>{errors.password_confirmation}</FieldError>
+                    <FieldError>{errors.last_name}</FieldError>
+                  </FieldContent>
+                </Field>
+
+                {/* Champ Email */}
+                <Field orientation="responsive" data-invalid={!!errors.email}>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={data.email}
+                      onChange={(e) => setData("email", e.target.value)}
+                      autoComplete="email"
+                      disabled={processing}
+                    />
+                    <FieldError>{errors.email}</FieldError>
+                  </FieldContent>
+                </Field>
+
+                {/* Champ Téléphone */}
+                <Field orientation="responsive" data-invalid={!!errors.phone}>
+                  <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      id="phone"
+                      type="text"
+                      value={data.phone}
+                      onChange={(e) => setData("phone", e.target.value)}
+                      autoComplete="tel"
+                      disabled={processing}
+                    />
+                    <FieldError>{errors.phone}</FieldError>
                   </FieldContent>
                 </Field>
               </FieldGroup>
-            </FieldSet>
-          )}
+            </TabsContent>
 
-          <Field orientation="horizontal" className="justify-end">
+            {/* Onglet Sécurité et accès */}
+            <TabsContent value="securite" className="space-y-4 pt-4">
+              <FieldGroup>
+                {/* Champ Rôle */}
+                <Field orientation="responsive" data-invalid={!!errors.role}>
+                  <FieldLabel htmlFor="role">Rôle d'accès</FieldLabel>
+                  <FieldContent>
+                    <Select
+                      value={data.role}
+                      onValueChange={(value) => setData("role", value)}
+                      disabled={processing}
+                    >
+                      <SelectTrigger id="role" className="w-full">
+                        <SelectValue placeholder="Sélectionnez un rôle" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {USER_ROLES.map((role) => (
+                          <SelectItem key={role.value} value={role.value}>
+                            {role.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldDescription>
+                      Définit le niveau d'accès de l'utilisateur.
+                    </FieldDescription>
+                    <FieldError>{errors.role}</FieldError>
+                  </FieldContent>
+                </Field>
+
+                {/* Section Mot de Passe - seulement en création */}
+                {!isEditing && (
+                  <FieldSet>
+                    <FieldLegend>Définir le mot de passe</FieldLegend>
+                    <FieldGroup>
+                      <Field
+                        orientation="responsive"
+                        data-invalid={!!errors.password}
+                      >
+                        <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={data.password}
+                            onChange={(e) =>
+                              setData("password", e.target.value)
+                            }
+                            autoComplete="new-password"
+                            disabled={processing}
+                          />
+                          <FieldError>{errors.password}</FieldError>
+                        </FieldContent>
+                      </Field>
+
+                      <Field
+                        orientation="responsive"
+                        data-invalid={!!errors.password_confirmation}
+                      >
+                        <FieldLabel htmlFor="password_confirmation">
+                          Confirmer mot de passe
+                        </FieldLabel>
+                        <FieldContent>
+                          <Input
+                            id="password_confirmation"
+                            type="password"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                              setData("password_confirmation", e.target.value)
+                            }
+                            autoComplete="new-password"
+                            disabled={processing}
+                          />
+                          <FieldError>
+                            {errors.password_confirmation}
+                          </FieldError>
+                        </FieldContent>
+                      </Field>
+                    </FieldGroup>
+                  </FieldSet>
+                )}
+              </FieldGroup>
+            </TabsContent>
+          </Tabs>
+
+          {/* Bouton de soumission en dehors des onglets */}
+          <Field
+            orientation="horizontal"
+            className="justify-end mt-6 pt-4 border-t"
+          >
             <Button
               type="submit"
               disabled={processing || (!isEditing && !validatePasswordMatch())}
-              // Désactiver si les mots de passe ne correspondent pas
             >
               {processing && <Spinner />}
               {processing

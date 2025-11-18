@@ -37,16 +37,25 @@ export const columns: ColumnDef<Property>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nom" />
     ),
-
   },
   {
     accessorKey: "type",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
     ),
-  
+
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+  <DataTableColumnHeader column={column} title="Statut" />
+    ),
+
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -59,10 +68,10 @@ export const columns: ColumnDef<Property>[] = [
     accessorKey: "monthly_rent",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Mensuel" />
-    )
+    ),
   },
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
-]
+];

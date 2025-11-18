@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useTeamStore, type User } from "../team-store";
+import { useTeamStore, type User } from "../../../../store/team-store";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;

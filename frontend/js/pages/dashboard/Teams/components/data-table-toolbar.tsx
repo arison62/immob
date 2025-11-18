@@ -9,7 +9,7 @@ import { DataTableViewOptions } from "../../components/data-table-view-options";
 import { roles } from "../data/data";
 import { DataTableFacetedFilter } from "../../components/data-table-faceted-filter";
 import UserCreationForm from "./user-creation-form";
-import { useTeamStore } from "../team-store";
+import { useTeamStore } from "../../../../store/team-store";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -67,7 +67,7 @@ export function DataTableToolbar<TData>({
           <DialogTrigger asChild>
             <Button size="sm" onClick={clearSelection}>Ajouter un utilisateur</Button>
           </DialogTrigger>
-          <DialogContent className="">
+          <DialogContent className="min-w-fit">
             <UserCreationForm />
           </DialogContent>
         </Dialog>

@@ -47,7 +47,7 @@ export function NavLocations({
   const { user } = useAuth();
   const url = usePage().url;
   const role = user?.role;
-  console.log(items)
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Locations</SidebarGroupLabel>

@@ -12,6 +12,7 @@ import {
   FieldGroup,
   FieldSet,
   FieldLegend,
+  FieldDescription,
 } from "@/components/ui/field";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Import des Tabs
@@ -21,6 +22,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { usePropertyStore, type Building } from "../property-store";
+import BuildingAccessForm, { type PermissionAssignment } from "./building-access-form";
 
 // Type pour le formulaire, basé sur BuildingCreateDTO
 type AddressFormData = {
@@ -37,6 +39,7 @@ type BuildingFormData = {
   description: string;
   floor_count: string | number; // Utiliser string pour le champ de formulaire
   address: AddressFormData;
+  permissions: PermissionAssignment[];
 };
 
 export default function BuildingForm() {
@@ -68,8 +71,9 @@ export default function BuildingForm() {
         street: "",
         postal_code: undefined,
         city: "",
-        country: "Cameroon", // Valeur par défaut
+        country: "Cameroon", // Valeur par défaut,
       },
+      permissions: [],
     });
 
   // Hydratation du formulaire en mode édition
@@ -87,6 +91,8 @@ export default function BuildingForm() {
           city: selectedBuilding.city,
           country: selectedBuilding.country,
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        permissions: (selectedBuilding as any).permissions || [],
       });
     } else {
       // Mode Création
@@ -103,6 +109,7 @@ export default function BuildingForm() {
     method("", {
       preserveScroll: true,
       replace: false,
+      except: ["buildings"],
       onSuccess: ({ props }) => {
         // Assumer que le backend renvoie le bâtiment mis à jour/créé
         const updatedOrNewBuilding = props.building as Building;
@@ -308,11 +315,22 @@ export default function BuildingForm() {
             <CardContent className="space-y-6 pt-6">
               <FieldSet>
                 <FieldLegend>Gestion des Droits d'Accès</FieldLegend>
-                <p className="text-muted-foreground text-sm">
-                  La gestion des permissions (basée sur
-                  `UserBuildingPermission`) sera disponible ici. (Composant de
-                  recherche d'utilisateur et d'assignation de rôle à venir).
-                </p>
+                <FieldDescription className="mb-4">
+                  Associez des utilisateurs de votre équipe à cet immeuble et
+                  définissez leur niveau de permission.
+                </FieldDescription>
+
+                <BuildingAccessForm
+                  value={data.permissions}
+                  onChange={(newPermissions) =>
+                    setData("permissions", newPermissions)
+                  }
+                  errors={errors} // Passe les erreurs d'Inertia
+                  disabled={processing}
+                />
+                {errors.permissions && (
+                  <FieldError>{errors.permissions}</FieldError>
+                )}
               </FieldSet>
             </CardContent>
           </TabsContent>
