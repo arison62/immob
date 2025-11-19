@@ -3,12 +3,10 @@ import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableViewOptions } from "../../components/data-table-view-options";
 
 import { DataTableFacetedFilter } from "../../components/data-table-faceted-filter";
 import { propertyStatuses, propertyTypes } from "../data/data";
-import { usePropertyStore } from "../property-store";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -17,11 +15,6 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFormOpen = usePropertyStore((state) => state.isPropertyFormOpen);
-  const setFormOpen = usePropertyStore((state) => state.setPropertyFormOpen);
-  const clearSelection = usePropertyStore(
-    (state) => state.clearPropertySelection
-  );
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
@@ -65,22 +58,6 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <DataTableViewOptions table={table} />
-        <Dialog
-          open={isFormOpen}
-          modal={true}
-          onOpenChange={() => {
-            setFormOpen(!isFormOpen);
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button size="sm" onClick={clearSelection}>
-              Ajouter une propriété
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="">
-            Property creation Form
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );

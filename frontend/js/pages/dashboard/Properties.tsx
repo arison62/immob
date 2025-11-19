@@ -9,7 +9,7 @@ import { usePage } from "@inertiajs/react";
 import { usePropertyStore, type Property, type Building } from "./Properties/property-store";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import CreatePropertyForm from "./Properties/components/forms/CreatePropertyForm";
+import CreatePropertyForm from "./Properties/components/forms/property-creation-form";
 
 
 function Properties() {

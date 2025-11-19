@@ -30,7 +30,7 @@ export interface Building {
  * Basée sur la sortie de `property_service.list_all_properties_for_user`
  */
 export interface Property {
-  id: string;
+  id?: string;
   name: string;
   building_id: string;
   building_permission: PermissionLevel; // Droit sur le bâtiment parent
@@ -41,6 +41,7 @@ export interface Property {
   room_count: number;
   bedroom_count: number | null;
   bathroom_count: number | null;
+  door_number?: string;
   monthly_rent: number;
   description: string | null;
   has_parking: boolean | null;
