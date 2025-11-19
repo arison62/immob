@@ -7,16 +7,23 @@ import { columns as columnsProperty } from "./Properties/components/columns-prop
 import { columns as columnsBuilding } from "./Properties/components/columns-building";
 import { usePage } from "@inertiajs/react";
 import { usePropertyStore, type Property, type Building } from "./Properties/property-store";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import CreatePropertyForm from "./Properties/components/forms/CreatePropertyForm";
 
 
 function Properties() {
   const page = usePage();
   const initialProperties = useMemo(() => (page.props.properties as Property[]) || [], [page.props.properties]);
   const initialBuildings = useMemo(() => (page.props.buildings as Building[]) || [], [page.props.buildings]);
-  const initializeProperties = usePropertyStore((state) => state.initializeProperties);
-  const initializeBuildings = usePropertyStore((state) => state.initializeBuildings);
-  const properties = usePropertyStore((state) => state.properties);
-  const buildings = usePropertyStore((state) => state.buildings);
+  const {
+    initializeProperties,
+    initializeBuildings,
+    properties,
+    buildings,
+    isPropertyFormOpen,
+    setPropertyFormOpen,
+  } = usePropertyStore();
 
   useEffect(() => {
     initializeProperties(initialProperties as Property[]);
@@ -24,7 +31,16 @@ function Properties() {
 
   useEffect(() => {
     initializeBuildings(initialBuildings as Building[]);
-  }, [initialBuildings, initializeBuildings]);  
+  }, [initialBuildings, initializeBuildings]);
+
+  const canCreateProperty = useMemo(() => {
+    return buildings.some(building =>
+      building.user_best_permission === 'CREATE' ||
+      building.user_best_permission === 'UPDATE' ||
+      building.user_best_permission === 'DELETE'
+    );
+  }, [buildings]);
+
   return (
     <div className="h-full flex-1 flex-col gap-8 p-8 md:flex">
       <div className="flex items-center justify-between gap-2">
@@ -34,6 +50,19 @@ function Properties() {
           </h2>
           <p className="text-muted-foreground">Vos biens listes ci-dessous.</p>
         </div>
+        {canCreateProperty && (
+          <Dialog open={isPropertyFormOpen} onOpenChange={setPropertyFormOpen}>
+            <DialogTrigger asChild>
+              <Button>Créer une propriété</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Créer une nouvelle propriété</DialogTitle>
+              </DialogHeader>
+              <CreatePropertyForm />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
       <Tabs defaultValue="property">
         <TabsList className="space-x-4">
