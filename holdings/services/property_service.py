@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from uuid import UUID
+from holdings.utils import generate_reference_code
 from typing import Literal, Optional, List, Dict, Any
 
 class PropertyService:
@@ -82,7 +83,8 @@ class PropertyService:
         data_to_create = property_data.model_dump(exclude={'building_id'})
         
         prop = Property.objects.create(
-            created_by=acting_user,
+            reference_code = generate_reference_code(property_data.type),
+            workspace = acting_user.workspace,
             building=parent_building,
             **data_to_create
         )

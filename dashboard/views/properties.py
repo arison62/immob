@@ -35,7 +35,6 @@ class PropertiesView(LoginRequiredMixin, View):
         try:
             data = self._parse_request_data(request)
             form_type = data.get("formType")
-            print(data)
             if form_type == "building":
                 building_dto = BuildingCreateDTO.model_validate(data)
                 new_building = building_service.create_building(
@@ -50,11 +49,13 @@ class PropertiesView(LoginRequiredMixin, View):
                 
             elif form_type == "property":
                 property_dto = PropertyCreateDTO.model_validate(data)
+               
                 new_property = property_service.create_property(
                     acting_user=request.user,
                     property_data=property_dto,
                     request=request
                 )
+                print("Property : ", new_property)
                 messages.success(request, f"Propriété {new_property.name} crée avec успex")
                 return render_inertia(request, "dashboard/Properties", {
                     "property": new_property
@@ -95,7 +96,7 @@ class PropertiesView(LoginRequiredMixin, View):
                 )
                 
                 messages.success(request, "Immeuble mis à jour avec succès.")
-                return render_inertia(request, "dashboard/Portfolio", {
+                return render_inertia(request, "dashboard/Properties", {
                     "building": updated_building
                 })
 
@@ -111,7 +112,7 @@ class PropertiesView(LoginRequiredMixin, View):
                 )
 
                 messages.success(request, "Propriété mise à jour avec succès.")
-                return render_inertia(request, "dashboard/Portfolio", {
+                return render_inertia(request, "dashboard/Properties", {
                     "property": updated_property
                 })
 
@@ -120,12 +121,12 @@ class PropertiesView(LoginRequiredMixin, View):
 
         except ValidationError as ve:
             errors = format_pydantic_errors(ve.errors())
-            return render_inertia(request, "dashboard/Portfolio", {
+            return render_inertia(request, "dashboard/Properties", {
                 "errors": errors
             })
         except Exception as e:
             messages.error(request, f"Erreur lors de la modification : {str(e)}")
-            return render_inertia(request, "dashboard/Portfolio", {
+            return render_inertia(request, "dashboard/Properties", {
                 "errors": [{"msg": str(e)}]
             })
         
