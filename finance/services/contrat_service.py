@@ -215,5 +215,15 @@ class ContratService:
             'id', 'contrat_number', 'tenant__first_name', 'tenant__last_name', 'start_date', 'end_date', 'status'
         )
 
+    def list_contrats_for_workspace(self, acting_user: ImmobUser):
+        """Liste tous les contrats pour le workspace de l'utilisateur."""
+        return Contrat.objects.filter(
+            workspace=acting_user.workspace,
+            is_deleted=False
+        ).select_related('tenant', 'property').values(
+            'id', 'contrat_number', 'tenant__first_name', 'tenant__last_name',
+            'property__name', 'start_date', 'end_date', 'status'
+        )
+
 # Instance du service
 contrat_service = ContratService()

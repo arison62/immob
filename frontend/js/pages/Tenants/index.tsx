@@ -1,24 +1,14 @@
 // frontend/js/pages/Tenants/index.tsx
-import React, { useEffect, useState } from 'react';
-import { Head } from '@inertiajs/react';
+import React from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/js/layouts/AuthenticatedLayout';
 import { Tenant } from '@/js/types';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import { UpsertTenantSheet } from './UpsertTenantSheet';
-import axios from 'axios';
-
-async function getTenants(): Promise<Tenant[]> {
-    const response = await axios.get('/api/finance/tenants/');
-    return response.data;
-}
 
 const TenantsPage = () => {
-    const [tenants, setTenants] = useState<Tenant[]>([]);
-
-    useEffect(() => {
-        getTenants().then(setTenants);
-    }, []);
+    const { tenants } = usePage<{ tenants: Tenant[] }>().props;
 
     return (
         <AuthenticatedLayout>

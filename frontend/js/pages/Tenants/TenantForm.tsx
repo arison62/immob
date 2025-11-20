@@ -1,81 +1,68 @@
 // frontend/js/pages/Tenants/TenantForm.tsx
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/js/components/ui/button';
 import { Input } from '@/js/components/ui/input';
 import { Label } from '@/js/components/ui/label';
 import { Textarea } from '@/js/components/ui/textarea';
-import axios from 'axios';
-
-const tenantSchema = z.object({
-    first_name: z.string().min(1, "Le prénom est requis."),
-    last_name: z.string().optional(),
-    email: z.string().email("L'email n'est pas valide.").optional().or(z.literal('')),
-    phone: z.string().min(1, "Le téléphone est requis."),
-    address: z.string().min(1, "L'adresse est requise."),
-    id_number: z.string().min(1, "Le numéro d'ID est requis."),
-    emergency_contact_name: z.string().min(1, "Le nom du contact d'urgence est requis."),
-    emergency_contact_phone: z.string().min(1, "Le téléphone du contact d'urgence est requis."),
-});
-
-type TenantFormData = z.infer<typeof tenantSchema>;
 
 export const TenantForm = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm<TenantFormData>({
-        resolver: zodResolver(tenantSchema),
+    const { data, setData, post, errors } = useForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        address: '',
+        id_number: '',
+        emergency_contact_name: '',
+        emergency_contact_phone: '',
     });
 
-    const onSubmit = async (data: TenantFormData) => {
-        try {
-            await axios.post('/api/finance/tenants/', data);
-            window.location.reload();
-        } catch (error) {
-            console.error(error);
-        }
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/tenants');
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <Label htmlFor="first_name">Prénom</Label>
-                <Input id="first_name" {...register('first_name')} />
-                {errors.first_name && <p className="text-red-500 text-xs mt-1">{errors.first_name.message}</p>}
+                <Input id="first_name" value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} />
+                {errors.first_name && <p className="text-red-500 text-xs mt-1">{errors.first_name}</p>}
             </div>
             <div>
                 <Label htmlFor="last_name">Nom</Label>
-                <Input id="last_name" {...register('last_name')} />
+                <Input id="last_name" value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} />
             </div>
             <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register('email')} />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
             <div>
                 <Label htmlFor="phone">Téléphone</Label>
-                <Input id="phone" {...register('phone')} />
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+                <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
+                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
             </div>
             <div className="md:col-span-2">
                 <Label htmlFor="address">Adresse</Label>
-                <Textarea id="address" {...register('address')} />
-                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
+                <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
+                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
             </div>
             <div>
                 <Label htmlFor="id_number">Numéro d'ID</Label>
-                <Input id="id_number" {...register('id_number')} />
-                {errors.id_number && <p className="text-red-500 text-xs mt-1">{errors.id_number.message}</p>}
+                <Input id="id_number" value={data.id_number} onChange={(e) => setData('id_number', e.target.value)} />
+                {errors.id_number && <p className="text-red-500 text-xs mt-1">{errors.id_number}</p>}
             </div>
             <div>
                 <Label htmlFor="emergency_contact_name">Nom du Contact d'Urgence</Label>
-                <Input id="emergency_contact_name" {...register('emergency_contact_name')} />
-                {errors.emergency_contact_name && <p className="text-red-500 text-xs mt-1">{errors.emergency_contact_name.message}</p>}
+                <Input id="emergency_contact_name" value={data.emergency_contact_name} onChange={(e) => setData('emergency_contact_name', e.target.value)} />
+                {errors.emergency_contact_name && <p className="text-red-500 text-xs mt-1">{errors.emergency_contact_name}</p>}
             </div>
             <div>
                 <Label htmlFor="emergency_contact_phone">Téléphone du Contact d'Urgence</Label>
-                <Input id="emergency_contact_phone" {...register('emergency_contact_phone')} />
-                {errors.emergency_contact_phone && <p className="text-red-500 text-xs mt-1">{errors.emergency_contact_phone.message}</p>}
+                <Input id="emergency_contact_phone" value={data.emergency_contact_phone} onChange={(e) => setData('emergency_contact_phone', e.target.value)} />
+                {errors.emergency_contact_phone && <p className="text-red-500 text-xs mt-1">{errors.emergency_contact_phone}</p>}
             </div>
             <div className="md:col-span-2 flex justify-end">
                 <Button type="submit">Sauvegarder</Button>

@@ -26,5 +26,4 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("dashboard/", include("dashboard.urls")),
-    path("api/finance/", include("finance.urls")),
 ] + debug_toolbar_urls()

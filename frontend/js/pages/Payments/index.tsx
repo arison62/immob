@@ -1,28 +1,14 @@
 // frontend/js/pages/Payments/index.tsx
-import React, { useEffect, useState } from 'react';
-import { Head } from '@inertiajs/react';
+import React from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/js/layouts/AuthenticatedLayout';
 import { Payment } from '@/js/types';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import { UpsertPaymentSheet } from './UpsertPaymentSheet';
-import axios from 'axios';
-
-// Note: This is a placeholder. The actual implementation will need to fetch
-// payments based on a contract, likely passed as a prop.
-async function getPayments(): Promise<Payment[]> {
-    // This endpoint should be something like /api/finance/contrats/{contrat_id}/payments/
-    // const response = await axios.get('/api/finance/payments/');
-    // return response.data;
-    return []; // Returning empty array for now
-}
 
 const PaymentsPage = () => {
-    const [payments, setPayments] = useState<Payment[]>([]);
-
-    useEffect(() => {
-        getPayments().then(setPayments);
-    }, []);
+    const { payments } = usePage<{ payments: Payment[] }>().props;
 
     return (
         <AuthenticatedLayout>
@@ -34,7 +20,7 @@ const PaymentsPage = () => {
                 </div>
                 <DataTable columns={columns} data={payments} />
             </div>
-        </AuthenticatedLayout>
+        </Authenticated-Layout>
     );
 };
 

@@ -168,5 +168,14 @@ class PaymentService:
             request=request
         )
 
+    def list_payments_for_workspace(self, acting_user: ImmobUser):
+        """Liste tous les paiements pour le workspace de l'utilisateur."""
+        return Payment.objects.filter(
+            contrat__workspace=acting_user.workspace
+        ).select_related('contrat__tenant', 'contrat__property').order_by('-due_date').values(
+            'id', 'reference_number', 'contrat__contrat_number', 'contrat__tenant__first_name',
+            'contrat__tenant__last_name', 'amount', 'due_date', 'status'
+        )
+
 # Instance du service
 payment_service = PaymentService()
