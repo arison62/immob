@@ -1,6 +1,6 @@
 # dashboard/views/contrats.py
 from django.views import View
-from inertia import Inertia
+from inertia import render as render_inertia
 from finance.services.contrat_service import contrat_service
 from finance.services.dtos import ContratCreateDTO, ContratUpdateDTO
 from pydantic import ValidationError
@@ -13,7 +13,7 @@ import json
 class ContratsView(View):
     def get(self, request):
         contrats = contrat_service.list_contrats_for_workspace(request.user)
-        return Inertia.render('Contrats/index', {
+        return render_inertia(request, 'Contrats/index', {
             'contrats': list(contrats)
         })
 
@@ -25,14 +25,16 @@ class ContratsView(View):
             return redirect('dashboard:contrats')
         except (ValidationError, json.JSONDecodeError) as e:
             errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            return Inertia.render('Contrats/index', {'errors': errors}, status=400)
+            contrats = contrat_service.list_contrats_for_workspace(request.user)
+            return render_inertia(request, 'Contrats/index', {'errors': errors, 'contrats': list(contrats)}, status=400)
         except Exception as e:
-            return Inertia.render('Contrats/index', {'errors': str(e)}, status=400)
+            contrats = contrat_service.list_contrats_for_workspace(request.user)
+            return render_inertia(request, 'Contrats/index', {'errors': str(e), 'contrats': list(contrats)}, status=400)
 
 class ContratEditView(View):
     def get(self, request, contrat_id: UUID):
         contrat = contrat_service.get_contrat_details(request.user, contrat_id)
-        return Inertia.render('Contrats/edit', {'contrat': contrat})
+        return render_inertia(request, 'Contrats/edit', {'contrat': contrat})
 
     def post(self, request, contrat_id: UUID):
         try:
@@ -42,9 +44,11 @@ class ContratEditView(View):
             return redirect('dashboard:contrats')
         except (ValidationError, json.JSONDecodeError) as e:
             errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            return Inertia.render('Contrats/edit', {'errors': errors}, status=400)
+            contrat = contrat_service.get_contrat_details(request.user, contrat_id)
+            return render_inertia(request, 'Contrats/edit', {'errors': errors, 'contrat': contrat}, status=400)
         except Exception as e:
-            return Inertia.render('Contrats/edit', {'errors': str(e)}, status=400)
+            contrat = contrat_service.get_contrat_details(request.user, contrat_id)
+            return render_inertia(request, 'Contrats/edit', {'errors': str(e), 'contrat': contrat}, status=400)
 
 def contrat_delete_view(request, contrat_id: UUID):
     if request.method == 'DELETE':
