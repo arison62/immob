@@ -1,14 +1,7 @@
-from inertia import render as render_inertia
+# dashboard/views/contrats.py
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
-from django.http.response import JsonResponse
-from accounts.services.access_services import AccessControlService
+from inertia import Inertia
 
-
-class ContratsView(LoginRequiredMixin, View):
-    login_url = "/accounts/login"
-
+class ContratsView(View):
     def get(self, request):
-        return render_inertia(request, "dashboard/Contrats")
-
+        return Inertia.render('Contrats/index', {})
