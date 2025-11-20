@@ -7,6 +7,9 @@ from .views.contrats import ContratsView
 from .views.tenants import TenantsView
 from .views.finances import FinancesView
 from .views.maintenances import MaintenancesView
+from .views.payments import PaymentsView
+
+app_name = "dashboard"
 
 urlpatterns = [
    path("", DashboardView.as_view(), name="dashboard"),
@@ -14,6 +17,7 @@ urlpatterns = [
    path("properties/", PropertiesView.as_view(), name="properties"),
    path("contrats/", ContratsView.as_view(), name="contrats"),
    path("tenants/", TenantsView.as_view(), name="tenants"),
+   path("payments/", PaymentsView.as_view(), name="payments"),
    path("finances/", FinancesView.as_view(), name="finances"),
    path("maintenances/", MaintenancesView.as_view(), name="maintenances"),
    path("permissions/", get_global_permissions, name="get_global_permissions"),

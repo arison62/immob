@@ -401,4 +401,3 @@ class Invoice(ImmobBaseModel):
             models.Index(fields=['status', 'issue_date']),
             models.Index(fields=['invoice_number']),
         ]
-    

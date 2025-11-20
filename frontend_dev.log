@@ -1,0 +1,3 @@
+
+> dev
+> TAILWIND_MODE=watch vite

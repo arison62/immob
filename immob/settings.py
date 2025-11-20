@@ -204,4 +204,12 @@ def immutable_file_test(path, url):
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 
+# ============================================================================
+# SÉCURITÉ ET CHIFFREMENT
+# ============================================================================
+
+SENSITIVE_DATA_KEY = env("SENSITIVE_DATA_KEY", default=None)
+
+if not SENSITIVE_DATA_KEY:
+    raise ValueError("La variable d'environnement SENSITIVE_DATA_KEY est requise pour le chiffrement.")
 
