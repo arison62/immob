@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableViewOptions } from "../../components/data-table-view-options";
 
 import { usePropertyStore } from "../property-store";
-import BuildingForm from "./forms/building-form";
+import BuildingForm from "./building-form";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

@@ -1,3 +1,6 @@
+// frontend/js/Pages/Portfolio/components/BuildingForm.tsx
+// (Assurez-vous que les imports de shadcn et des stores sont corrects)
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"; // Ajout pour la description
@@ -18,8 +21,8 @@ import { useEffect, type FormEvent } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { usePropertyStore, type Building } from "../../property-store";
-import BuildingAccessForm, { type PermissionAssignment } from "../building-access-form";
+import { usePropertyStore, type Building } from "../property-store";
+import BuildingAccessForm, { type PermissionAssignment } from "./building-access-form";
 
 // Type pour le formulaire, basé sur BuildingCreateDTO
 type AddressFormData = {

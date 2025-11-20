@@ -21,8 +21,8 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const setFormOpen = usePropertyStore((state) => state.setPropertyFormOpen);
-  const selectProperty = usePropertyStore((state) => state.selectProperty);
- 
+  const selectUser = usePropertyStore((state) => state.selectProperty);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,7 +38,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           onClick={() => {
-            selectProperty(row.original as Property);
+            selectUser(row.original as Property);
             setFormOpen(true);
           }}
         >
