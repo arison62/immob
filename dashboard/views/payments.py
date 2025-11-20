@@ -6,11 +6,17 @@ from finance.services.dtos import PaymentCreateDTO, PaymentUpdateDTO
 from pydantic import ValidationError
 from core.utils import format_pydantic_errors
 from django.shortcuts import redirect
-from django.http import JsonResponse
+from django.contrib import messages
 from uuid import UUID
 import json
 
 class PaymentsView(View):
+
+    def _parse_request_data(self, request):
+        if request.body:
+            return json.loads(request.body)
+        return {}
+
     def get(self, request):
         payments = payment_service.list_payments_for_workspace(request.user)
         return render_inertia(request, 'Payments/index', {
@@ -19,42 +25,46 @@ class PaymentsView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
+            data = self._parse_request_data(request)
             payment_dto = PaymentCreateDTO(**data)
             payment_service.create_payment(request.user, payment_dto, request)
+            messages.success(request, "Paiement créé avec succès.")
             return redirect('dashboard:payments')
-        except (ValidationError, json.JSONDecodeError) as e:
-            errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            payments = payment_service.list_payments_for_workspace(request.user)
-            return render_inertia(request, 'Payments/index', {'errors': errors, 'payments': list(payments)}, status=400)
-        except Exception as e:
-            payments = payment_service.list_payments_for_workspace(request.user)
-            return render_inertia(request, 'Payments/index', {'errors': str(e), 'payments': list(payments)}, status=400)
+        except (ValidationError, Exception) as e:
+            error_message = str(e)
+            if isinstance(e, ValidationError):
+                error_message = format_pydantic_errors(e.errors())
+            messages.error(request, f"Erreur lors de la création : {error_message}")
+            return redirect('dashboard:payments')
 
-class PaymentEditView(View):
-    def get(self, request, payment_id: UUID):
-        payment = payment_service.get_payment_details(request.user, payment_id)
-        return render_inertia(request, 'Payments/edit', {'payment': payment})
-
-    def post(self, request, payment_id: UUID):
+    def put(self, request):
         try:
-            data = json.loads(request.body)
+            data = self._parse_request_data(request)
+            payment_id = data.get('id')
+            if not payment_id:
+                raise ValueError("ID du paiement manquant pour la mise à jour.")
+
             payment_dto = PaymentUpdateDTO(**data)
-            payment_service.update_payment_status(request.user, payment_id, payment_dto, request)
+            payment_service.update_payment_status(request.user, UUID(payment_id), payment_dto, request)
+            messages.success(request, "Paiement mis à jour avec succès.")
             return redirect('dashboard:payments')
-        except (ValidationError, json.JSONDecodeError) as e:
-            errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            payment = payment_service.get_payment_details(request.user, payment_id)
-            return render_inertia(request, 'Payments/edit', {'errors': errors, 'payment': payment}, status=400)
-        except Exception as e:
-            payment = payment_service.get_payment_details(request.user, payment_id)
-            return render_inertia(request, 'Payments/edit', {'errors': str(e), 'payment': payment}, status=400)
+        except (ValidationError, Exception) as e:
+            error_message = str(e)
+            if isinstance(e, ValidationError):
+                error_message = format_pydantic_errors(e.errors())
+            messages.error(request, f"Erreur lors de la mise à jour : {error_message}")
+            return redirect('dashboard:payments')
 
-def payment_delete_view(request, payment_id: UUID):
-    if request.method == 'DELETE':
+    def delete(self, request):
         try:
-            payment_service.delete_payment(request.user, payment_id, request)
-            return JsonResponse({}, status=204)
+            data = self._parse_request_data(request)
+            payment_id = data.get('id')
+            if not payment_id:
+                raise ValueError("ID du paiement manquant pour la suppression.")
+
+            payment_service.delete_payment(request.user, UUID(payment_id), request)
+            messages.success(request, "Paiement supprimé avec succès.")
+            return redirect('dashboard:payments')
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+            messages.error(request, f"Erreur lors de la suppression : {str(e)}")
+            return redirect('dashboard:payments')

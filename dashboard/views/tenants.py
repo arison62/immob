@@ -6,11 +6,18 @@ from finance.services.dtos import TenantCreateDTO, TenantUpdateDTO
 from pydantic import ValidationError
 from core.utils import format_pydantic_errors
 from django.shortcuts import redirect
-from django.http import JsonResponse
+from django.contrib import messages
 from uuid import UUID
 import json
 
 class TenantsView(View):
+
+    def _parse_request_data(self, request):
+        """Helper to parse JSON data from the request body."""
+        if request.body:
+            return json.loads(request.body)
+        return {}
+
     def get(self, request):
         tenants = tenant_service.list_tenants_for_workspace(request.user)
         return render_inertia(request, 'Tenants/index', {
@@ -19,45 +26,47 @@ class TenantsView(View):
 
     def post(self, request):
         try:
-            data = json.loads(request.body)
+            data = self._parse_request_data(request)
             data['workspace_id'] = request.user.workspace_id
             tenant_dto = TenantCreateDTO(**data)
             tenant_service.create_tenant(request.user, tenant_dto, request)
+            messages.success(request, "Locataire créé avec succès.")
             return redirect('dashboard:tenants')
-        except (ValidationError, json.JSONDecodeError) as e:
-            errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            # It's better to re-render with the errors on the same page/component
-            # This requires fetching the initial data again.
-            tenants = tenant_service.list_tenants_for_workspace(request.user)
-            return render_inertia(request, 'Tenants/index', {'errors': errors, 'tenants': list(tenants)}, status=400)
-        except Exception as e:
-            tenants = tenant_service.list_tenants_for_workspace(request.user)
-            return render_inertia(request, 'Tenants/index', {'errors': str(e), 'tenants': list(tenants)}, status=400)
+        except (ValidationError, Exception) as e:
+            error_message = str(e)
+            if isinstance(e, ValidationError):
+                error_message = format_pydantic_errors(e.errors())
+            messages.error(request, f"Erreur lors de la création : {error_message}")
+            return redirect('dashboard:tenants')
 
-class TenantEditView(View):
-    def get(self, request, tenant_id: UUID):
-        tenant = tenant_service.get_tenant_details(request.user, tenant_id)
-        return render_inertia(request, 'Tenants/edit', {'tenant': tenant})
-
-    def post(self, request, tenant_id: UUID):
+    def put(self, request):
         try:
-            data = json.loads(request.body)
+            data = self._parse_request_data(request)
+            tenant_id = data.get('id')
+            if not tenant_id:
+                raise ValueError("ID du locataire manquant pour la mise à jour.")
+
             tenant_dto = TenantUpdateDTO(**data)
-            tenant_service.update_tenant(request.user, tenant_id, tenant_dto, request)
+            tenant_service.update_tenant(request.user, UUID(tenant_id), tenant_dto, request)
+            messages.success(request, "Locataire mis à jour avec succès.")
             return redirect('dashboard:tenants')
-        except (ValidationError, json.JSONDecodeError) as e:
-            errors = format_pydantic_errors(e.errors()) if isinstance(e, ValidationError) else {'error': str(e)}
-            tenant = tenant_service.get_tenant_details(request.user, tenant_id)
-            return render_inertia(request, 'Tenants/edit', {'errors': errors, 'tenant': tenant}, status=400)
-        except Exception as e:
-            tenant = tenant_service.get_tenant_details(request.user, tenant_id)
-            return render_inertia(request, 'Tenants/edit', {'errors': str(e), 'tenant': tenant}, status=400)
+        except (ValidationError, Exception) as e:
+            error_message = str(e)
+            if isinstance(e, ValidationError):
+                error_message = format_pydantic_errors(e.errors())
+            messages.error(request, f"Erreur lors de la mise à jour : {error_message}")
+            return redirect('dashboard:tenants')
 
-def tenant_delete_view(request, tenant_id: UUID):
-    if request.method == 'DELETE':
+    def delete(self, request):
         try:
-            tenant_service.delete_tenant(request.user, tenant_id, request)
-            return JsonResponse({}, status=204)
+            data = self._parse_request_data(request)
+            tenant_id = data.get('id')
+            if not tenant_id:
+                raise ValueError("ID du locataire manquant pour la suppression.")
+
+            tenant_service.delete_tenant(request.user, UUID(tenant_id), request)
+            messages.success(request, "Locataire supprimé avec succès.")
+            return redirect('dashboard:tenants')
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+            messages.error(request, f"Erreur lors de la suppression : {str(e)}")
+            return redirect('dashboard:tenants')

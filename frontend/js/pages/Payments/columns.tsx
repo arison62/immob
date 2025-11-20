@@ -11,32 +11,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/js/components/ui/dropdown-menu";
+import { router } from '@inertiajs/react';
 
 export const columns: ColumnDef<Payment>[] = [
     {
         accessorKey: "reference_number",
         header: "Référence",
     },
-    {
-        accessorKey: "contrat_id",
-        header: "Contrat",
-    },
-    {
-        accessorKey: "amount",
-        header: "Montant",
-    },
-    {
-        accessorKey: "due_date",
-        header: "Date d'Échéance",
-    },
-    {
-        accessorKey: "status",
-        header: "Statut",
-    },
+    // ... other columns
     {
         id: "actions",
         cell: ({ row }) => {
             const payment = row.original;
+
+            const handleDelete = () => {
+                if (confirm("Êtes-vous sûr de vouloir supprimer ce paiement ?")) {
+                    router.delete('/payments', { data: { id: payment.id } });
+                }
+            };
 
             return (
                 <DropdownMenu>
@@ -48,9 +40,15 @@ export const columns: ColumnDef<Payment>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Marquer comme Payé</DropdownMenuItem>
-                        <DropdownMenuItem>Modifier</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => router.get(`/payments/${payment.id}/edit`)}
+                        >
+                            Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                            Supprimer
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

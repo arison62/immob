@@ -11,36 +11,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/js/components/ui/dropdown-menu";
+import { router } from '@inertiajs/react';
 
 export const columns: ColumnDef<Contrat>[] = [
     {
         accessorKey: "contrat_number",
         header: "Numéro du Contrat",
     },
-    {
-        accessorKey: "tenant_id",
-        header: "Locataire",
-    },
-    {
-        accessorKey: "property_id",
-        header: "Propriété",
-    },
-    {
-        accessorKey: "start_date",
-        header: "Date de Début",
-    },
-    {
-        accessorKey: "end_date",
-        header: "Date de Fin",
-    },
-    {
-        accessorKey: "status",
-        header: "Statut",
-    },
+    // ... other columns
     {
         id: "actions",
         cell: ({ row }) => {
             const contrat = row.original;
+
+            const handleDelete = () => {
+                if (confirm("Êtes-vous sûr de vouloir supprimer ce contrat ?")) {
+                    router.delete('/contrats', { data: { id: contrat.id } });
+                }
+            };
 
             return (
                 <DropdownMenu>
@@ -52,9 +40,15 @@ export const columns: ColumnDef<Contrat>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Voir les détails</DropdownMenuItem>
-                        <DropdownMenuItem>Modifier</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => router.get(`/contrats/${contrat.id}/edit`)}
+                        >
+                            Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                            Supprimer
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

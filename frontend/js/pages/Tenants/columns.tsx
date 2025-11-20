@@ -1,6 +1,6 @@
 // frontend/js/pages/Tenants/columns.tsx
 import { ColumnDef } from "@tanstack/react-table";
-import { Tenant } from "@/js/types"; // Assurez-vous que le type Tenant est défini
+import { Tenant } from "@/js/types";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/js/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/js/components/ui/dropdown-menu";
+import { router } from '@inertiajs/react';
 
 export const columns: ColumnDef<Tenant>[] = [
     {
@@ -34,6 +35,12 @@ export const columns: ColumnDef<Tenant>[] = [
         cell: ({ row }) => {
             const tenant = row.original;
 
+            const handleDelete = () => {
+                if (confirm("Êtes-vous sûr de vouloir supprimer ce locataire ?")) {
+                    router.delete('/tenants', { data: { id: tenant.id } });
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -45,14 +52,14 @@ export const columns: ColumnDef<Tenant>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(tenant.id)}
+                            onClick={() => router.get(`/tenants/${tenant.id}/edit`)}
                         >
-                            Copier l'ID
+                            Modifier
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Voir les détails</DropdownMenuItem>
-                        <DropdownMenuItem>Modifier</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                            Supprimer
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
