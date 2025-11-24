@@ -24,6 +24,13 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+
 export default function ContratForm() {
   const { selectedContrat, addContrat, updateContrat, setFormOpen, clearSelection } = useContratStore();
   const { tenants } = useTenantStore();
@@ -39,6 +46,7 @@ export default function ContratForm() {
     security_deposit: selectedContrat?.security_deposit || 0,
     charges: selectedContrat?.charges || 0,
     terms: selectedContrat?.terms || "",
+    payment_frequency: selectedContrat?.payment_frequency || "MONTHLY",
   });
 
   const isEditing = !!selectedContrat;
@@ -55,11 +63,19 @@ export default function ContratForm() {
         security_deposit: selectedContrat.security_deposit ?? 0,
         charges: selectedContrat.charges ?? 0,
         terms: selectedContrat.terms ?? "",
+        payment_frequency: selectedContrat.payment_frequency,
       });
     } else {
         reset();
     }
   }, [selectedContrat]);
+
+  useEffect(() => {
+    const selectedProperty = properties.find(p => p.id === data.property_id);
+    if (selectedProperty) {
+      setData("monthly_rent", selectedProperty.monthly_rent);
+    }
+  }, [data.property_id, properties]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,68 +123,96 @@ export default function ContratForm() {
             : "Remplissez les informations pour créer un nouveau contrat."}
         </DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="property_id">Propriété</Label>
-          <Select value={data.property_id} onValueChange={(value) => setData("property_id", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionnez une propriété" />
-            </SelectTrigger>
-            <SelectContent>
-              {properties.map((prop) => (
-                <SelectItem key={prop.id} value={prop.id}>
-                  {prop.name} ({prop.reference_code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.property_id && <p className="text-red-500 text-xs">{errors.property_id}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="tenant_id">Locataire</Label>
-          <Select value={data.tenant_id} onValueChange={(value) => setData("tenant_id", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionnez un locataire" />
-            </SelectTrigger>
-            <SelectContent>
-              {tenants.map((tenant) => (
-                <SelectItem key={tenant.id} value={tenant.id}>
-                  {tenant.first_name} {tenant.last_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.tenant_id && <p className="text-red-500 text-xs">{errors.tenant_id}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="start_date">Date de début</Label>
-          <Input type="date" id="start_date" value={data.start_date} onChange={(e) => setData("start_date", e.target.value)} />
-          {errors.start_date && <p className="text-red-500 text-xs">{errors.start_date}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="end_date">Date de fin</Label>
-          <Input type="date" id="end_date" value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
-          {errors.end_date && <p className="text-red-500 text-xs">{errors.end_date}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="monthly_rent">Loyer Mensuel</Label>
-          <Input type="number" id="monthly_rent" value={data.monthly_rent} onChange={(e) => setData("monthly_rent", parseFloat(e.target.value) || 0)} />
-          {errors.monthly_rent && <p className="text-red-500 text-xs">{errors.monthly_rent}</p>}
-        </div>
-        <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="terms">Termes du contrat</Label>
-            <Textarea id="terms" value={data.terms} onChange={(e) => setData("terms", e.target.value)} />
-            {errors.terms && <p className="text-red-500 text-xs">{errors.terms}</p>}
-        </div>
+      <form onSubmit={handleSubmit}>
+        <Tabs defaultValue="base-info" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="base-info">Informations de base</TabsTrigger>
+            <TabsTrigger value="financial-info">Informations financières</TabsTrigger>
+            </TabsList>
+            <TabsContent value="base-info">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="property_id">Propriété</Label>
+                        <Select value={data.property_id} onValueChange={(value) => setData("property_id", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez une propriété" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {properties.map((prop) => (
+                                    <SelectItem key={prop.id} value={prop.id}>
+                                        {prop.name} ({prop.reference_code})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.property_id && <p className="text-red-500 text-xs">{errors.property_id}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="tenant_id">Locataire</Label>
+                        <Select value={data.tenant_id} onValueChange={(value) => setData("tenant_id", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez un locataire" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {tenants.map((tenant) => (
+                                    <SelectItem key={tenant.id} value={tenant.id}>
+                                        {tenant.first_name} {tenant.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.tenant_id && <p className="text-red-500 text-xs">{errors.tenant_id}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="start_date">Date de début</Label>
+                        <Input type="date" id="start_date" value={data.start_date} onChange={(e) => setData("start_date", e.target.value)} />
+                        {errors.start_date && <p className="text-red-500 text-xs">{errors.start_date}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="end_date">Date de fin</Label>
+                        <Input type="date" id="end_date" value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
+                        {errors.end_date && <p className="text-red-500 text-xs">{errors.end_date}</p>}
+                    </div>
+                </div>
+            </TabsContent>
+            <TabsContent value="financial-info">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="monthly_rent">Loyer Mensuel</Label>
+                        <Input type="number" id="monthly_rent" value={data.monthly_rent} disabled />
+                        {errors.monthly_rent && <p className="text-red-500 text-xs">{errors.monthly_rent}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="payment_frequency">Fréquence de paiement</Label>
+                        <Select value={data.payment_frequency} onValueChange={(value) => setData("payment_frequency", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez une fréquence" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="MONTHLY">Mensuel</SelectItem>
+                                <SelectItem value="QUARTERLY">Trimestriel</SelectItem>
+                                <SelectItem value="ANNUALLY">Annuel</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.payment_frequency && <p className="text-red-500 text-xs">{errors.payment_frequency}</p>}
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor="terms">Termes du contrat</Label>
+                        <Textarea id="terms" value={data.terms} onChange={(e) => setData("terms", e.target.value)} />
+                        {errors.terms && <p className="text-red-500 text-xs">{errors.terms}</p>}
+                    </div>
+                </div>
+            </TabsContent>
+        </Tabs>
       </form>
-       <DialogFooter>
+      <DialogFooter>
         <DialogClose asChild>
-            <Button variant="outline" onClick={() => {
-                setFormOpen(false);
-                clearSelection();
-            }}>
-                Annuler
-            </Button>
+          <Button variant="outline" onClick={() => {
+            setFormOpen(false);
+            clearSelection();
+          }}>
+            Annuler
+          </Button>
         </DialogClose>
         <Button onClick={handleSubmit} disabled={processing}>
           {processing ? "Sauvegarde..." : (isEditing ? "Mettre à jour" : "Sauvegarder")}

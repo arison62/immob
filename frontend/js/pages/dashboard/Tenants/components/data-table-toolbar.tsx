@@ -1,0 +1,44 @@
+import { type Table } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DataTableViewOptions } from "../../components/data-table-view-options";
+import TenantForm from "./tenant-form";
+import { useTenantStore } from "@/store/tenant-store";
+
+interface DataTableToolbarProps<TData> {
+  table: Table<TData>;
+}
+
+export function DataTableToolbar<TData>({
+  table,
+}: DataTableToolbarProps<TData>) {
+  const { isFormOpen, setFormOpen, clearSelection } = useTenantStore();
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 items-center gap-2">
+        {/* Des filtres pourront être ajoutés ici */}
+      </div>
+      <div className="flex items-center gap-2">
+        <DataTableViewOptions table={table} />
+        <Dialog
+          open={isFormOpen}
+          modal={true}
+          onOpenChange={(isOpen) => {
+            setFormOpen(isOpen);
+            if (!isOpen) {
+              clearSelection();
+            }
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button size="sm" onClick={() => setFormOpen(true)}>Ajouter un locataire</Button>
+          </DialogTrigger>
+          <DialogContent className="min-w-fit">
+            <TenantForm />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}
