@@ -1,11 +1,11 @@
 "use client"
 
 import { type ColumnDef } from "@tanstack/react-table"
-import { Contrat } from "../../../../store/contrat-store"
+import { type Contrat } from "@/store/contrat-store"
 import { DataTableColumnHeader } from "../../components/data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Badge } from "@/js/components/ui/badge"
-import { Checkbox } from "@/js/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export const columns: ColumnDef<Contrat>[] = [
   {
@@ -47,6 +47,7 @@ export const columns: ColumnDef<Contrat>[] = [
         TERMINATED: "destructive",
       }[status] ?? "default"
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return <Badge variant={variant as any}>{status}</Badge>
     },
     filterFn: (row, id, value) => {

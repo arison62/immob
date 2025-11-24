@@ -18,7 +18,7 @@ import { useEffect, type FormEvent } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { usePropertyStore, type Building } from "../../property-store";
+import { usePropertyStore, type Building } from "@/store/property-store";
 import BuildingAccessForm, { type PermissionAssignment } from "../building-access-form";
 
 // Type pour le formulaire, basé sur BuildingCreateDTO

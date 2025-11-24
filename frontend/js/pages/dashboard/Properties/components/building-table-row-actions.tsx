@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { usePropertyStore, type Building } from "../property-store";
+import { usePropertyStore, type Building } from "@/store/property-store";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -21,7 +21,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const setFormOpen = usePropertyStore((state) => state.setBuildingFormOpen);
-  const selectUser = usePropertyStore((state) => state.selectBuilding);
+  const selecteBuilding = usePropertyStore((state) => state.selectBuilding);
 
   return (
     <DropdownMenu>
@@ -38,7 +38,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           onClick={() => {
-            selectUser(row.original as Building);
+            selecteBuilding(row.original as Building);
             setFormOpen(true);
           }}
         >

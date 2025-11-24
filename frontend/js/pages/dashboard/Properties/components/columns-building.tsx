@@ -3,7 +3,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@/components/ui/checkbox"
 
-import { type Building } from "../property-store"
+import { type Building } from "@/store/property-store"
 import { DataTableColumnHeader } from "../../components/data-table-column-header"
 import { DataTableRowActions } from "./building-table-row-actions"
 

@@ -1,28 +1,13 @@
 import DashboardLayout from "./DashboardLayout";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode} from "react";
 import { DataTable } from "./Contrats/components/data-table"; // Chemin corrigé
 import { columns } from "./Contrats/components/columns"; // Chemin corrigé
-import { useContratStore, Contrat } from "../../store/contrat-store"; // Import du store
-import { usePage } from "@inertiajs/react";
+import { useContratStore,} from "@/store/contrat-store"; // Import du store
 
-// Interface pour les props venant d'Inertia
-interface ContratsPageProps {
-  contrats: Contrat[];
-}
 
 function Contrats() {
-  const { props } = usePage<ContratsPageProps>();
-  const { initializeContrats, contrats } = useContratStore((state) => ({
-    initializeContrats: state.initializeContrats,
-    contrats: state.contrats,
-  }));
+  const contrats  = useContratStore((state) => state.contrats);
 
-  // Hydrater le store avec les données initiales du serveur
-  useEffect(() => {
-    if (props.contrats) {
-      initializeContrats(props.contrats);
-    }
-  }, [props.contrats, initializeContrats]);
 
   return (
     <div className="h-full flex-1 flex-col gap-8 p-8 md:flex">

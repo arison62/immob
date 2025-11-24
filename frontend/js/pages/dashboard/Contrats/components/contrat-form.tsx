@@ -1,26 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useForm } from "@inertiajs/react";
-import { useContratStore, Contrat } from "../../../../store/contrat-store";
-import { useTenantStore } from "../../../../store/tenant-store";
-import { usePropertyStore } from "../../../../store/property-store";
-import { Button } from "@/js/components/ui/button";
-import { Input } from "@/js/components/ui/input";
-import { Label } from "@/js/components/ui/label";
-import { Textarea } from "@/js/components/ui/textarea";
+import { useContratStore, type Contrat } from "@/store/contrat-store";
+import { useTenantStore } from "@/store/tenant-store";
+import { usePropertyStore } from "@/store/property-store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/js/components/ui/select";
+} from "@/components/ui/select";
 import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from "@/js/components/ui/dialog";
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 export default function ContratForm() {
@@ -85,7 +86,7 @@ export default function ContratForm() {
     if (isEditing) {
       put(`/dashboard/contrats/${data.id}`, options);
     } else {
-      post("/dashboard/contrats", options);
+      post("/dashboard/contrats/", options);
     }
   };
 

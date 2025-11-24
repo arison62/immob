@@ -1,6 +1,6 @@
 import { type Table } from "@tanstack/react-table";
-import { Button } from "@/js/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/js/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableViewOptions } from "../../components/data-table-view-options";
 import ContratForm from "./contrat-form"; // Le formulaire de contrat
 import { useContratStore } from "../../../../store/contrat-store"; // Le store de contrat

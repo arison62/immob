@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DataTableViewOptions } from "../../components/data-table-view-options";
 
-import { usePropertyStore } from "../property-store";
+import { usePropertyStore } from "@/store/property-store";
 import BuildingForm from "./forms/building-form";
 
 interface DataTableToolbarProps<TData> {
@@ -16,9 +16,9 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFormOpen = usePropertyStore((state) => state.isBuildingFormOpen);
-  const setFormOpen = usePropertyStore((state) => state.setBuildingFormOpen);
-  const clearSelection = usePropertyStore((state) => state.clearBuildingSelection);
+  const isFormOpen = usePropertyStore((state) => state.isPropertyFormOpen);
+  const setFormOpen = usePropertyStore((state) => state.setPropertyFormOpen);
+  const clearSelection = usePropertyStore((state) => state.clearPropertySelection);
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (

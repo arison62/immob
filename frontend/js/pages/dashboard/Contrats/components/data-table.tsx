@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/js/components/ui/table"
+} from "@/components/ui/table"
 
 import { DataTablePagination } from "../../components/data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar" // Chemin corrigé

@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "@inertiajs/react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
-import { usePropertyStore, type Property } from "../../property-store";
+import { usePropertyStore, type Property } from "@/store/property-store";
 import { Label } from "@/components/ui/label";
 import {
   Select,

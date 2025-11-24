@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { User } from "./team-store"; // Réutiliser si possible, sinon définir une interface locale
+
 
 // Définition des types basés sur les TextChoices de Django
 export type ContratStatus = "DRAFT" | "ACTIVE" | "EXPIRED" | "TERMINATED";

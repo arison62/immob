@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { usePropertyStore, type Property } from "../property-store";
+import { usePropertyStore, type Property } from "@/store/property-store";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;

@@ -10,6 +10,7 @@ import { usePage } from "@inertiajs/react";
 import { useTeamStore, type User } from "@/store/team-store";
 import { useTenantStore, type Tenant } from "@/store/tenant-store";
 import { usePropertyStore, type Property } from "@/store/property-store";
+import { useContratStore, type Contrat } from "@/store/contrat-store";
 
 function Index() {
     const page = usePage();
@@ -32,6 +33,12 @@ function Index() {
     useEffect(() => {
       initializeProperties(initialProperties);
     }, [initialProperties, initializeProperties]);
+
+    const initialContracts = useMemo(() => (page.props.contracts as Contrat[]) || [], [page.props.contracts]);
+    const initializeContracts = useContratStore((state) => state.initializeContrats);
+    useEffect(() => {
+      initializeContracts(initialContracts);
+    }, [initialContracts, initializeContracts]);
   
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

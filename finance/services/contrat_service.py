@@ -181,7 +181,6 @@ class ContratService:
             action=AuditLog.AuditAction.UPDATE,
             entity_type='Contrat',
             entity_id=str(contrat.id),
-            details=f"Changement de statut vers {new_status}",
             request=request
         )
 

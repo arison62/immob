@@ -1,14 +1,14 @@
 import { type Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { Button } from "@/js/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/js/components/ui/dropdown-menu";
-import { useContratStore, type Contrat } from "../../../../store/contrat-store";
+} from "@/components/ui/dropdown-menu";
+import { useContratStore, type Contrat } from "@/store/contrat-store";
 import { useForm } from "@inertiajs/react";
 import { toast } from "sonner";
 
