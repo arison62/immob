@@ -20,7 +20,7 @@ const PaymentsPage = () => {
                 </div>
                 <DataTable columns={columns} data={payments} />
             </div>
-        </Authenticated-Layout>
+        </AuthenticatedLayout>
     );
 };
 

@@ -1,11 +1,10 @@
 # dashboard/views/contrats.py
 from django.views import View
-from inertia import render as render_inertia
+from inertia import render as render_inertia, defer
 from finance.services.contrat_service import contrat_service
 from finance.services.dtos import ContratCreateDTO, ContratUpdateDTO
 from pydantic import ValidationError
 from core.utils import format_pydantic_errors
-from django.shortcuts import redirect
 from django.contrib import messages
 from uuid import UUID
 import json
@@ -15,27 +14,30 @@ class ContratsView(View):
     def _parse_request_data(self, request):
         if request.body:
             return json.loads(request.body)
-        return {}
+        return request.POST or {}
 
     def get(self, request):
         contrats = contrat_service.list_contrats_for_workspace(request.user)
-        return render_inertia(request, 'Contrats/index', {
-            'contrats': list(contrats)
+        return render_inertia(request, 'dashboard/Contrats', {
+            'contrats': defer(lambda: list(contrats), merge=True)
         })
 
     def post(self, request):
         try:
             data = self._parse_request_data(request)
-            contrat_dto = ContratCreateDTO(**data)
-            contrat_service.create_contrat(request.user, contrat_dto, request)
+            contrat_dto = ContratCreateDTO.model_validate(data)
+            new_contrat = contrat_service.create_contrat(request.user, contrat_dto, request)
             messages.success(request, "Contrat créé avec succès.")
-            return redirect('dashboard:contrats')
-        except (ValidationError, Exception) as e:
-            error_message = str(e)
-            if isinstance(e, ValidationError):
-                error_message = format_pydantic_errors(e.errors())
-            messages.error(request, f"Erreur lors de la création : {error_message}")
-            return redirect('dashboard:contrats')
+            return render_inertia(request, "dashboard/Contrats", {
+                "contrat": new_contrat
+            })
+        except ValidationError as ve:
+            errors = format_pydantic_errors(ve.errors())
+            messages.error(request, "Erreur de validation lors de la création du contrat.")
+            return render_inertia(request, "dashboard/Contrats", {"errors": errors})
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la création du contrat : {str(e)}")
+            return render_inertia(request, "dashboard/Contrats", {"errors": [{"msg": str(e)}]})
 
     def put(self, request):
         try:
@@ -44,16 +46,19 @@ class ContratsView(View):
             if not contrat_id:
                 raise ValueError("ID du contrat manquant pour la mise à jour.")
 
-            contrat_dto = ContratUpdateDTO(**data)
-            contrat_service.update_contrat(request.user, UUID(contrat_id), contrat_dto, request)
+            contrat_dto = ContratUpdateDTO.model_validate(data)
+            updated_contrat = contrat_service.update_contrat(request.user, UUID(contrat_id), contrat_dto, request)
             messages.success(request, "Contrat mis à jour avec succès.")
-            return redirect('dashboard:contrats')
-        except (ValidationError, Exception) as e:
-            error_message = str(e)
-            if isinstance(e, ValidationError):
-                error_message = format_pydantic_errors(e.errors())
-            messages.error(request, f"Erreur lors de la mise à jour : {error_message}")
-            return redirect('dashboard:contrats')
+            return render_inertia(request, "dashboard/Contrats", {
+                "contrat": updated_contrat
+            })
+        except ValidationError as ve:
+            errors = format_pydantic_errors(ve.errors())
+            messages.error(request, "Erreur de validation lors de la mise à jour.")
+            return render_inertia(request, "dashboard/Contrats", {"errors": errors})
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la mise à jour : {str(e)}")
+            return render_inertia(request, "dashboard/Contrats", {"errors": [{"msg": str(e)}]})
 
     def delete(self, request):
         try:
@@ -64,7 +69,9 @@ class ContratsView(View):
 
             contrat_service.delete_contrat(request.user, UUID(contrat_id), request)
             messages.success(request, "Contrat supprimé avec succès.")
-            return redirect('dashboard:contrats')
+            return render_inertia(request, "dashboard/Contrats", {
+                "deleted_id": contrat_id
+            })
         except Exception as e:
             messages.error(request, f"Erreur lors de la suppression : {str(e)}")
-            return redirect('dashboard:contrats')
+            return render_inertia(request, "dashboard/Contrats", {"errors": [{"msg": str(e)}]})

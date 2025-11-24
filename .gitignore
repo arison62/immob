@@ -22,3 +22,4 @@ node_modules/
 
 # Virtual environments
 .venv
+\n# Log files\n*.log

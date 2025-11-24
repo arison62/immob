@@ -103,18 +103,13 @@ WSGI_APPLICATION = "immob.wsgi.application"
 if "DATABASE_URL" in env:
     DATABASES = {"default": env.db()}
 else:
+    # Default to SQLite in-memory for local development/testing if DATABASE_URL is not set
     DATABASES = {
         "default": {
-            
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "immob",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
-            "HOST": "localhost",
-            "PORT": "5432",
-            
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
-}
+    }
 
 
 # Password validation
