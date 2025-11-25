@@ -47,6 +47,7 @@ export default function ContratForm() {
     charges: selectedContrat?.charges || 0,
     terms: selectedContrat?.terms || "",
     payment_frequency: selectedContrat?.payment_frequency || "MONTHLY",
+    payment_method: selectedContrat?.payment_method || "BANK_TRANSFER",
   });
 
   const isEditing = !!selectedContrat;
@@ -64,6 +65,7 @@ export default function ContratForm() {
         charges: selectedContrat.charges ?? 0,
         terms: selectedContrat.terms ?? "",
         payment_frequency: selectedContrat.payment_frequency,
+        payment_method: selectedContrat.payment_method,
       });
     } else {
         reset();
@@ -195,6 +197,21 @@ export default function ContratForm() {
                             </SelectContent>
                         </Select>
                         {errors.payment_frequency && <p className="text-red-500 text-xs">{errors.payment_frequency}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="payment_method">Méthode de paiement</Label>
+                        <Select value={data.payment_method} onValueChange={(value) => setData("payment_method", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez une méthode" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="CASH">Espèces</SelectItem>
+                                <SelectItem value="BANK_TRANSFER">Virement</SelectItem>
+                                <SelectItem value="CHECK">Chèque</SelectItem>
+                                <SelectItem value="CARD">Carte</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.payment_method && <p className="text-red-500 text-xs">{errors.payment_method}</p>}
                     </div>
                     <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="terms">Termes du contrat</Label>
