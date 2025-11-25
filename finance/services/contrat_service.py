@@ -73,14 +73,22 @@ class ContratService:
 
         data_to_create = contrat_data.model_dump()
         
+        # Le statut et la méthode de paiement sont maintenant gérés
         contrat = Contrat.objects.create(
-            contrat_number= generate_contrat_number(),
+            contrat_number=generate_contrat_number(),
             workspace=acting_user.workspace,
             property=prop,
             tenant=tenant,
             created_by=acting_user,
+            status=data_to_create.pop('status', Contrat.ContratStatus.DRAFT),
             **data_to_create
         )
+        contrat.generate_payments()
+
+        # Note: La méthode de paiement est implicitement gérée si elle est un champ du modèle Contrat.
+        # Si ce n'est pas le cas, il faudrait l'associer à un modèle de paiement.
+        # Pour cet exemple, supposons que `payment_method` n'est pas directement sur Contrat mais
+        # influence la génération des paiements.
         AuditLogService.log_action(
             user=acting_user,
             action=AuditLog.AuditAction.CREATE,
@@ -111,7 +119,15 @@ class ContratService:
         old_values: Dict[str, Any] = {}
 
         for key, value in update_data.items():
-            old_values[key] = getattr(contrat_to_update, key)
+            # Assurer la conversion correcte pour les enums
+            current_value = getattr(contrat_to_update, key)
+            if isinstance(current_value, str) and hasattr(Contrat.ContratStatus, '_member_map_') and current_value in Contrat.ContratStatus._member_map_:
+                old_values[key] = current_value
+            elif hasattr(current_value, 'value'):
+                old_values[key] = current_value.value
+            else:
+                old_values[key] = current_value
+
             setattr(contrat_to_update, key, value)
 
         contrat_to_update.updated_by = acting_user
