@@ -9,6 +9,7 @@ from .dtos import ContratCreateDTO, ContratUpdateDTO
 from core.services.audit_log_service import AuditLogService, AuditLog
 from holdings.services.property_service import property_service
 from .tenant_service import tenant_service
+from finance.utils import generate_contrat_number
 from django.utils import timezone
 
 class ContratService:
@@ -64,28 +65,32 @@ class ContratService:
 
         # 2. Vérifier que le locataire existe et est dans le même workspace
         tenant = tenant_service._get_tenant_for_user(acting_user, contrat_data.tenant_id, request)
-
+        
         # 3. Vérifier que la propriété est disponible
         prop = Property.objects.get(id=contrat_data.property_id)
         if prop.status != Property.PropertyStatus.AVAILABLE:
             raise ValueError("La propriété n'est pas disponible pour un nouveau contrat.")
 
         data_to_create = contrat_data.model_dump()
-
+        
         contrat = Contrat.objects.create(
+            contrat_number= generate_contrat_number(),
             workspace=acting_user.workspace,
-            property_id=data_to_create.pop('property_id'),
+            property=prop,
             tenant=tenant,
             created_by=acting_user,
             **data_to_create
         )
-
         AuditLogService.log_action(
             user=acting_user,
             action=AuditLog.AuditAction.CREATE,
             entity_type='Contrat',
             entity_id=str(contrat.id),
-            new_values=contrat_data.model_dump(),
+            new_values={
+                'property_id': str(data_to_create.pop('property_id')),
+                'tenant_id': str(data_to_create.pop('tenant_id')),
+                **data_to_create
+                },
             request=request,
         )
 

@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field, EmailStr, constr
+from pydantic import BaseModel, Field, EmailStr, StringConstraints
 from uuid import UUID
 from datetime import date, datetime
-from typing import Optional, List
+from typing import Optional, Annotated
 from decimal import Decimal
 from finance.models import Contrat, Payment
 
@@ -17,10 +17,10 @@ class TenantBaseDTO(BaseModel):
     address: str
     emergency_contact_name: str = Field(max_length=200)
     emergency_contact_phone: str = Field(max_length=20)
-    id_number: constr(min_length=1) # Champ pour le numéro d'ID, sera chiffré
+    id_number: Annotated[str, StringConstraints(min_length=1)]
 
 class TenantCreateDTO(TenantBaseDTO):
-    workspace_id: UUID
+    pass
 
 class TenantUpdateDTO(TenantBaseDTO):
     first_name: Optional[str] = Field(None, max_length=100)
@@ -28,7 +28,7 @@ class TenantUpdateDTO(TenantBaseDTO):
     address: Optional[str] = None
     emergency_contact_name: Optional[str] = Field(None, max_length=200)
     emergency_contact_phone: Optional[str] = Field(None, max_length=20)
-    id_number: Optional[constr(min_length=1)] = None
+    id_number: Optional[Annotated[str, StringConstraints(min_length=1)]] = None
 
 class TenantDetailsDTO(TenantBaseDTO):
     id: UUID

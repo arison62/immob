@@ -44,7 +44,9 @@ def encrypt_data(data: str) -> str:
     """
     if not data:
         return ""
+    
     cipher_suite = get_cipher_suite()
+    
     encrypted_bytes = cipher_suite.encrypt(data.encode('utf-8'))
     return encrypted_bytes.decode('utf-8')
 

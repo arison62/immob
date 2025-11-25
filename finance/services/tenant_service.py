@@ -37,16 +37,13 @@ class TenantService:
         Crée un nouveau locataire.
         L'ID number est chiffré avant d'être sauvegardé.
         """
-        if acting_user.workspace_id != tenant_data.workspace_id:
-            raise PermissionError("Opération non autorisée sur ce workspace.")
-
         # Chiffrer les données sensibles
         encrypted_id_number = encrypt_data(tenant_data.id_number)
-
+        print(encrypted_id_number)
         data_to_create = tenant_data.model_dump(exclude={'id_number'})
 
         tenant = Tenant.objects.create(
-            workspace_id=acting_user.workspace_id,
+            workspace=acting_user.workspace,
             id_number=encrypted_id_number,
             **data_to_create
         )
@@ -128,7 +125,7 @@ class TenantService:
 
         tenant_details = {
             "id": tenant.id,
-            "workspace_id": tenant.workspace_id,
+            "workspace_id": tenant.workspace.pk,
             "first_name": tenant.first_name,
             "last_name": tenant.last_name,
             "email": tenant.email,

@@ -1,4 +1,4 @@
-def generate_contract_number():
+def generate_contrat_number():
     """Génère un numéro de contrat unique"""
     from django.utils import timezone
     import random
