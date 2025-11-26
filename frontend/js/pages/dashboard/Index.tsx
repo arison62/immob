@@ -4,7 +4,6 @@ import { SectionCards } from "@/components/section-cards";
 
 import DashboardLayout from "./DashboardLayout";
 
-import data from "./data.json";
 import { useEffect, useMemo, type ReactNode } from "react";
 import { usePage } from "@inertiajs/react";
 import { useTeamStore, type User } from "@/store/team-store";
@@ -12,6 +11,7 @@ import { useTenantStore, type Tenant } from "@/store/tenant-store";
 import { usePropertyStore, type Property } from "@/store/property-store";
 import { useContratStore, type Contrat } from "@/store/contrat-store";
 import { useStatisticsStore } from "@/store/statistics-store";
+import { usePaymentStore, type Payment } from "@/store/payment-store";
 
 function Index() {
     const page = usePage();
@@ -41,6 +41,12 @@ function Index() {
       initializeContracts(initialContracts);
     }, [initialContracts, initializeContracts]);
 
+    const initialPayments = useMemo(() => (page.props.payments as Payment[]) || [], [page.props.payments]);
+    const initializePayments = usePaymentStore((state) => state.initializePayments);
+    useEffect(() => {
+        initializePayments(initialPayments);
+    }, [initialPayments, initializePayments]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const initialStatistics = useMemo(() => page.props.statistics as any, [page.props.statistics]);
     const initializeStatistics = useStatisticsStore((state) => state.initializeStatistics);
@@ -53,14 +59,16 @@ function Index() {
         occupancyRate: initialStatistics.occupancy_rate
       });
     }, [initialStatistics, initializeStatistics]);
-  console.log(page.props.statistics)
+
+  const payments = usePaymentStore((state) => state.payments);
+
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <SectionCards />
       <div className="px-4 lg:px-6">
         <ChartAreaInteractive />
       </div>
-      <DataTable data={data} />
+      <DataTable data={payments} />
     </div>
   );
 }
