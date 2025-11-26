@@ -48,7 +48,6 @@ class ContratBaseDTO(BaseModel):
     property_id: UUID
     tenant_id: UUID
     start_date: date
-    end_date: date
     monthly_rent: Decimal = Field(gt=0)
     security_deposit: Optional[Decimal] = Field(None, ge=0)
     charges: Optional[Decimal] = Field(None, ge=0)
@@ -56,7 +55,8 @@ class ContratBaseDTO(BaseModel):
     terms: Optional[str] = None
 
 class ContratCreateDTO(ContratBaseDTO):
-    pass
+    status: Optional[Contrat.ContratStatus] = None
+    duration_in_months: int = Field(gt=0)
 
 class ContratUpdateDTO(ContratBaseDTO):
     property_id: Optional[UUID] = None
