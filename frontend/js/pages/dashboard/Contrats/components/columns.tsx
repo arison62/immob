@@ -77,7 +77,7 @@ export const columns: ColumnDef<Contrat>[] = [
       const amount = parseFloat(row.getValue("monthly_rent"))
       const formatted = new Intl.NumberFormat("fr-FR", {
         style: "currency",
-        currency: "EUR",
+        currency: "CFA",
       }).format(amount)
       return <div className="text-right font-medium">{formatted}</div>
     },

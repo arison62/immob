@@ -1,14 +1,13 @@
 import DashboardLayout from "./DashboardLayout";
-import { type ReactNode} from "react";
+import { type ReactNode } from "react";
 import { DataTable } from "./Contrats/components/data-table"; // Chemin corrigé
 import { columns } from "./Contrats/components/columns"; // Chemin corrigé
-import { useContratStore,} from "@/store/contrat-store"; // Import du store
-
+import { useContratStore } from "@/store/contrat-store"; // Import du store
 
 function Contrats() {
-  const contrats  = useContratStore((state) => state.contrats);
+  const contrats = useContratStore((state) => state.contrats);
 
-
+  console.log(contrats);
   return (
     <div className="h-full flex-1 flex-col gap-8 p-8 md:flex">
       <div className="flex items-center justify-between gap-2">
@@ -27,5 +26,7 @@ function Contrats() {
   );
 }
 
-Contrats.layout = (page : ReactNode) => <DashboardLayout>{page}</DashboardLayout>;
+Contrats.layout = (page: ReactNode) => (
+  <DashboardLayout>{page}</DashboardLayout>
+);
 export default Contrats;

@@ -5,6 +5,7 @@ export interface Property {
   id: string; // UUID
   name: string;
   reference_code: string;
+  monthly_rent: string;
 }
 
 // Basé sur le modèle Building de Django

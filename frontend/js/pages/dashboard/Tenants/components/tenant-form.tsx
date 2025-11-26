@@ -19,7 +19,7 @@ export default function TenantForm() {
   const { selectedTenant, addTenant, updateTenant, setFormOpen, clearSelection } = useTenantStore();
 
   const { data, setData, post, put, errors, processing, reset, wasSuccessful } = useForm({
-    id: selectedTenant?.id || "",
+    id: selectedTenant?.id,
     first_name: selectedTenant?.first_name || "",
     last_name: selectedTenant?.last_name || "",
     email: selectedTenant?.email || "",
@@ -35,6 +35,7 @@ export default function TenantForm() {
   useEffect(() => {
     if (isEditing) {
       setData({
+        // @ts-expect-error selectedTenant is checked by isEditing, but TS doesn't narrow it in the setData call
         id: selectedTenant.id,
         first_name: selectedTenant.first_name,
         last_name: selectedTenant.last_name,
@@ -46,9 +47,9 @@ export default function TenantForm() {
         emergency_contact_phone: selectedTenant.emergency_contact_phone,
       });
     } else {
-        reset();
+      reset();
     }
-  }, [selectedTenant]);
+  }, [selectedTenant, reset]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -31,6 +31,8 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
+import { type PaymentFrequency } from "@/store/contrat-store";
+
 export default function ContratForm() {
   const { selectedContrat, addContrat, updateContrat, setFormOpen, clearSelection } = useContratStore();
   const { tenants } = useTenantStore();
@@ -54,12 +56,13 @@ export default function ContratForm() {
 
   useEffect(() => {
     if (isEditing) {
+      // @ts-expect-error selectedTenant is checked by isEditing, but TS doesn't narrow it in the setData call
       setData({
         id: selectedContrat.id,
         property_id: selectedContrat.property_id,
         tenant_id: selectedContrat.tenant_id,
-        start_date: selectedContrat.start_date.split('T')[0],
-        end_date: selectedContrat.end_date.split('T')[0],
+        start_date: selectedContrat.start_date.split("T")[0],
+        end_date: selectedContrat.end_date.split("T")[0],
         monthly_rent: selectedContrat.monthly_rent,
         security_deposit: selectedContrat.security_deposit ?? 0,
         charges: selectedContrat.charges ?? 0,
@@ -74,7 +77,7 @@ export default function ContratForm() {
   useEffect(() => {
     const selectedProperty = properties.find(p => p.id === data.property_id);
     if (selectedProperty) {
-      setData("monthly_rent", selectedProperty.monthly_rent);
+      setData("monthly_rent", Number(selectedProperty.monthly_rent));
     }
   }, [data.property_id, properties]);
 
@@ -185,7 +188,7 @@ export default function ContratForm() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="payment_frequency">Fréquence de paiement</Label>
-                        <Select value={data.payment_frequency} onValueChange={(value) => setData("payment_frequency", value)}>
+                        <Select value={data.payment_frequency} onValueChange={(value) => setData("payment_frequency", value as PaymentFrequency)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Sélectionnez une fréquence" />
                             </SelectTrigger>
