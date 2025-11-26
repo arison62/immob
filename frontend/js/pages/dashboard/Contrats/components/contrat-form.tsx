@@ -41,12 +41,13 @@ export default function ContratForm() {
     property_id: selectedContrat?.property_id || "",
     tenant_id: selectedContrat?.tenant_id || "",
     start_date: selectedContrat?.start_date || "",
-    end_date: selectedContrat?.end_date || "",
+    duration_in_months: 12,
     monthly_rent: selectedContrat?.monthly_rent || 0,
     security_deposit: selectedContrat?.security_deposit || 0,
     charges: selectedContrat?.charges || 0,
     terms: selectedContrat?.terms || "",
     payment_frequency: selectedContrat?.payment_frequency || "MONTHLY",
+    payment_method: "BANK_TRANSFER",
   });
 
   const isEditing = !!selectedContrat;
@@ -169,9 +170,9 @@ export default function ContratForm() {
                         {errors.start_date && <p className="text-red-500 text-xs">{errors.start_date}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="end_date">Date de fin</Label>
-                        <Input type="date" id="end_date" value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
-                        {errors.end_date && <p className="text-red-500 text-xs">{errors.end_date}</p>}
+                        <Label htmlFor="duration_in_months">Durée (en mois)</Label>
+                        <Input type="number" id="duration_in_months" value={data.duration_in_months} onChange={(e) => setData("duration_in_months", parseInt(e.target.value))} />
+                        {errors.duration_in_months && <p className="text-red-500 text-xs">{errors.duration_in_months}</p>}
                     </div>
                 </div>
             </TabsContent>
@@ -195,6 +196,21 @@ export default function ContratForm() {
                             </SelectContent>
                         </Select>
                         {errors.payment_frequency && <p className="text-red-500 text-xs">{errors.payment_frequency}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="payment_method">Méthode de paiement</Label>
+                        <Select value={data.payment_method} onValueChange={(value) => setData("payment_method", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez une méthode" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="CASH">Espèces</SelectItem>
+                                <SelectItem value="BANK_TRANSFER">Virement</SelectItem>
+                                <SelectItem value="CHECK">Chèque</SelectItem>
+                                <SelectItem value="CARD">Carte</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.payment_method && <p className="text-red-500 text-xs">{errors.payment_method}</p>}
                     </div>
                     <div className="md:col-span-2 space-y-2">
                         <Label htmlFor="terms">Termes du contrat</Label>
