@@ -11,6 +11,8 @@ import { useTeamStore, type User } from "@/store/team-store";
 import { useTenantStore, type Tenant } from "@/store/tenant-store";
 import { usePropertyStore, type Property } from "@/store/property-store";
 import { useContratStore, type Contrat } from "@/store/contrat-store";
+import { usePaymentStore } from "@/store/payment-store";
+import { type Payment } from "@/types";
 
 function Index() {
     const page = usePage();
@@ -39,6 +41,12 @@ function Index() {
     useEffect(() => {
       initializeContracts(initialContracts);
     }, [initialContracts, initializeContracts]);
+
+    const initialPayments = useMemo(() => (page.props.payments as Payment[]) || [], [page.props.payments]);
+    const initializePayments = usePaymentStore((state) => state.initializePayments);
+    useEffect(() => {
+      initializePayments(initialPayments);
+    }, [initialPayments, initializePayments]);
   
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -46,7 +54,6 @@ function Index() {
       <div className="px-4 lg:px-6">
         <ChartAreaInteractive />
       </div>
-      <DataTable data={data} />
     </div>
   );
 }

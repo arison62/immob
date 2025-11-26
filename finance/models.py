@@ -194,14 +194,14 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
     def __str__(self):
         return f"{self.contrat_number} - {self.tenant}"
 
-    def activate(self):
+    def activate(self, payment_method=None):
         """Active le contrat"""
         
         self.status = self.ContratStatus.ACTIVE
         from holdings.models import Property
         self.property.change_status(Property.PropertyStatus.OCCUPIED)
         self.save()
-        self.generate_payments()
+        self.generate_payments(payment_method=payment_method)
 
     def terminate(self):
         """Termine le contrat"""
@@ -217,26 +217,30 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
             self.start_date <= timezone.now().date() <= self.end_date
         )
 
-    def generate_payments(self):
+    def generate_payments(self, payment_method=None):
         """Génère les paiements pour le contrat"""
         from dateutil.relativedelta import relativedelta
         
         if self.status != self.ContratStatus.ACTIVE:
             return
-        
+
         current_date = self.start_date
         payment_number = 1
         
         while current_date <= self.end_date:
+            defaults = {
+                'amount': self.monthly_rent + self.charges,
+                'status': Payment.PaymentStatus.PENDING,
+                'reference_number': f"{self.contrat_number}-{payment_number:03d}",
+                'created_by': self.created_by
+            }
+            if payment_method:
+                defaults['payment_method'] = payment_method
+
             Payment.objects.get_or_create(
                 contrat=self,
                 due_date=current_date,
-                defaults={
-                    'amount': self.monthly_rent + self.charges,
-                    'status': Payment.PaymentStatus.PENDING,
-                    'reference_number': f"{self.contrat_number}-{payment_number:03d}",
-                    'created_by': self.created_by
-                }
+                defaults=defaults
             )
             
             # Incrémenter selon la fréquence
