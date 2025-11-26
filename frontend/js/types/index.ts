@@ -17,6 +17,17 @@ export type Contrat = {
     end_date: string;
     monthly_rent: number;
     status: 'DRAFT' | 'ACTIVE' | 'EXPIRED' | 'TERMINATED';
+    payment_frequency: 'MONTHLY' | 'QUARTERLY' | 'ANNUALLY';
+    security_deposit?: number;
+};
+
+export type Invoice = {
+    id: string;
+    payment_id: string;
+    invoice_number: string;
+    issue_date: string;
+    total_amount: number;
+    status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE';
 };
 
 export type Payment = {

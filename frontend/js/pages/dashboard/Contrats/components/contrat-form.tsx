@@ -41,12 +41,13 @@ export default function ContratForm() {
     property_id: selectedContrat?.property_id || "",
     tenant_id: selectedContrat?.tenant_id || "",
     start_date: selectedContrat?.start_date || "",
-    end_date: selectedContrat?.end_date || "",
+    duration_in_months: 12,
     monthly_rent: selectedContrat?.monthly_rent || 0,
     security_deposit: selectedContrat?.security_deposit || 0,
     charges: selectedContrat?.charges || 0,
     terms: selectedContrat?.terms || "",
     payment_frequency: selectedContrat?.payment_frequency || "MONTHLY",
+    status: selectedContrat?.status || "DRAFT",
   });
 
   const isEditing = !!selectedContrat;
@@ -169,9 +170,22 @@ export default function ContratForm() {
                         {errors.start_date && <p className="text-red-500 text-xs">{errors.start_date}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="end_date">Date de fin</Label>
-                        <Input type="date" id="end_date" value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
-                        {errors.end_date && <p className="text-red-500 text-xs">{errors.end_date}</p>}
+                        <Label htmlFor="duration_in_months">Durée (en mois)</Label>
+                        <Input type="number" id="duration_in_months" value={data.duration_in_months} onChange={(e) => setData("duration_in_months", parseInt(e.target.value))} />
+                        {errors.duration_in_months && <p className="text-red-500 text-xs">{errors.duration_in_months}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="status">Statut</Label>
+                        <Select value={data.status} onValueChange={(value) => setData("status", value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez un statut" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="DRAFT">Brouillon</SelectItem>
+                                <SelectItem value="ACTIVE">Actif</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.status && <p className="text-red-500 text-xs">{errors.status}</p>}
                     </div>
                 </div>
             </TabsContent>
