@@ -54,6 +54,8 @@ class ContratBaseDTO(BaseModel):
     charges: Optional[Decimal] = Field(None, ge=0)
     payment_frequency: Contrat.PaymentFrequency = Contrat.PaymentFrequency.MONTHLY
     terms: Optional[str] = None
+    status: Optional[Contrat.ContratStatus] = Contrat.ContratStatus.DRAFT
+    payment_method: Optional[Payment.PaymentMethod] = Payment.PaymentMethod.BANK_TRANSFER
 
 class ContratCreateDTO(ContratBaseDTO):
     pass

@@ -27,3 +27,12 @@ export type Payment = {
     status: 'PENDING' | 'PAID' | 'LATE' | 'CANCELLED';
     payment_method?: 'CASH' | 'BANK_TRANSFER' | 'CHECK' | 'CARD';
 };
+
+export type Invoice = {
+    id: string;
+    payment_id: string;
+    invoice_number: string;
+    issue_date: string;
+    total_amount: number;
+    status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE';
+};
