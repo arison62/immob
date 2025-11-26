@@ -35,18 +35,25 @@ function Index() {
       initializeProperties(initialProperties);
     }, [initialProperties, initializeProperties]);
 
-    const initialContracts = useMemo(() => (page.props.contracts as Contrat[]) || [], [page.props.contracts]);
+    const initialContracts = useMemo(() => (page.props.contrats as Contrat[]) || [], [page.props.contrats]);
     const initializeContracts = useContratStore((state) => state.initializeContrats);
     useEffect(() => {
       initializeContracts(initialContracts);
     }, [initialContracts, initializeContracts]);
 
-    const initialStatistics = useMemo(() => page.props.statistics, [page.props.statistics]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const initialStatistics = useMemo(() => page.props.statistics as any, [page.props.statistics]);
     const initializeStatistics = useStatisticsStore((state) => state.initializeStatistics);
     useEffect(() => {
-      initializeStatistics(initialStatistics);
+      initializeStatistics({
+        totalPaid: initialStatistics.total_paid,
+        totalPending: initialStatistics.total_pending,
+        totalLate: initialStatistics.total_late,
+        activeContrats: initialStatistics.active_contrats,
+        occupancyRate: initialStatistics.occupancy_rate
+      });
     }, [initialStatistics, initializeStatistics]);
-  
+  console.log(page.props.statistics)
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <SectionCards />

@@ -100,6 +100,10 @@ class ContratService:
             new_values={
                 'property_id': str(data_to_create.pop('property_id')),
                 'tenant_id': str(data_to_create.pop('tenant_id')),
+                'start_date': str(data_to_create.pop('start_date')),
+                'monthly_rent': str(data_to_create.pop('monthly_rent')),
+                'charges': str(data_to_create.pop('charges')),
+                'security_deposit': str(data_to_create.pop('security_deposit')),
                 **data_to_create
                 },
             request=request,
