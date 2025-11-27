@@ -90,8 +90,6 @@ class ContratService:
             **data_to_create
         )
 
-        if status == Contrat.ContratStatus.ACTIVE:
-            contrat.activate()
         AuditLogService.log_action(
             user=acting_user,
             action=AuditLog.AuditAction.CREATE,
@@ -187,9 +185,7 @@ class ContratService:
             request
         )
 
-        if new_status == Contrat.ContratStatus.ACTIVE:
-            contrat.activate()
-        elif new_status == Contrat.ContratStatus.TERMINATED:
+        if new_status == Contrat.ContratStatus.TERMINATED:
             contrat.terminate()
         else:
             # Gérer d'autres statuts si nécessaire
