@@ -8,6 +8,7 @@ from finance.services.tenant_service import tenant_service
 from finance.services.contrat_service import contrat_service
 from holdings.services.property_service import property_service
 from finance.services.statistics_service import statistics_service
+from finance.services.payment_service import payment_service
 from accounts.services.access_services import AccessControlService
 
 
@@ -20,13 +21,15 @@ class DashboardView(LoginRequiredMixin, View):
         contrats = contrat_service.list_contrats_for_workspace(request.user)
         properties = property_service.list_all_properties_for_user(request.user)
         statistics = statistics_service.get_workspace_statistics(request.user)
+        payments = payment_service.list_payments_for_workspace(request.user)
 
         return render_inertia(request, "dashboard/Index", {
             "users": defer(users, merge=True),
             "tenants": defer(tenants, merge=True),
             "properties": defer(properties, merge=True),
             "contrats": defer(contrats, merge=True),
-            "statistics": statistics
+            "statistics": statistics,
+            "payments": defer(payments, merge=True)
         })
 
 
