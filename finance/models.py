@@ -194,14 +194,12 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
     def __str__(self):
         return f"{self.contrat_number} - {self.tenant}"
 
-    def activate(self):
-        """Active le contrat"""
-        
-        self.status = self.ContratStatus.ACTIVE
-        from holdings.models import Property
-        self.property.change_status(Property.PropertyStatus.OCCUPIED)
-        self.save()
-        self.generate_payments()
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == self.ContratStatus.ACTIVE and not self.contrat_payments.exists():
+            from holdings.models import Property
+            self.property.change_status(Property.PropertyStatus.OCCUPIED)
+            self.generate_payments()
 
     def terminate(self):
         """Termine le contrat"""
@@ -220,25 +218,30 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
     def generate_payments(self):
         """Génère les paiements pour le contrat"""
         from dateutil.relativedelta import relativedelta
-        
+
+        # Correction: Vérifier si des paiements existent déjà pour éviter les doublons
+        if self.contrat_payments.exists():
+            return
+
         if self.status != self.ContratStatus.ACTIVE:
             return
-        
+
         current_date = self.start_date
         payment_number = 1
-        
-        while current_date <= self.end_date:
-            Payment.objects.get_or_create(
-                contrat=self,
-                due_date=current_date,
-                defaults={
-                    'amount': self.monthly_rent + self.charges, # type: ignore
-                    'status': Payment.PaymentStatus.PAID,
-                    'reference_number': f"{self.contrat_number}-{payment_number:03d}",
-                    'created_by': self.created_by
-                }
+
+        payments_to_create = []
+        while current_date < self.end_date:
+            payments_to_create.append(
+                Payment(
+                    contrat=self,
+                    due_date=current_date,
+                    amount=self.monthly_rent + self.charges,
+                    status=Payment.PaymentStatus.PENDING,
+                    reference_number=f"{self.contrat_number}-{payment_number:03d}",
+                    created_by=self.created_by
+                )
             )
-            
+
             # Incrémenter selon la fréquence
             if self.payment_frequency == self.PaymentFrequency.MONTHLY:
                 current_date += relativedelta(months=1)
@@ -246,8 +249,10 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
                 current_date += relativedelta(months=3)
             elif self.payment_frequency == self.PaymentFrequency.ANNUALLY:
                 current_date += relativedelta(years=1)
-            
+
             payment_number += 1
+
+        Payment.objects.bulk_create(payments_to_create)
 
 
 # ============================================================================
