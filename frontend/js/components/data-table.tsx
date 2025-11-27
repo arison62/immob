@@ -39,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Payment } from "@/store/payment-store"
+import { type Payment } from "@/store/payment-store"
 
 
 const columns: ColumnDef<Payment>[] = [
@@ -75,17 +75,17 @@ const columns: ColumnDef<Payment>[] = [
       },
       {
         accessorFn: (row) => `${row.contrat__tenant__first_name} ${row.contrat__tenant__last_name}`,
-        header: "Tenant",
+        header: "Locataire",
         id: "tenantFullName"
       },
       {
         accessorKey: "amount",
-        header: () => <div className="text-right">Amount</div>,
+        header: () => <div className="text-right">Montant</div>,
         cell: ({ row }) => {
           const amount = parseFloat(row.getValue("amount"))
           const formatted = new Intl.NumberFormat("fr-FR", {
             style: "currency",
-            currency: "EUR",
+            currency: "CFA",
           }).format(amount)
 
           return <div className="text-right font-medium">{formatted}</div>
@@ -93,7 +93,7 @@ const columns: ColumnDef<Payment>[] = [
       },
       {
         accessorKey: "due_date",
-        header: "Due Date",
+        header: "Date d'échéance",
       },
       {
         accessorKey: "status",
