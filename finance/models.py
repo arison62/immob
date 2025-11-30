@@ -232,8 +232,8 @@ class Contrat(SoftDeletedModelMixin, ImmobBaseModel):
                 contrat=self,
                 due_date=current_date,
                 defaults={
-                    'amount': self.monthly_rent + self.charges,
-                    'status': Payment.PaymentStatus.PENDING,
+                    'amount': self.monthly_rent + self.charges, # type: ignore
+                    'status': Payment.PaymentStatus.PAID,
                     'reference_number': f"{self.contrat_number}-{payment_number:03d}",
                     'created_by': self.created_by
                 }

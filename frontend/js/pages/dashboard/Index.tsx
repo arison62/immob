@@ -11,6 +11,7 @@ import { useTeamStore, type User } from "@/store/team-store";
 import { useTenantStore, type Tenant } from "@/store/tenant-store";
 import { usePropertyStore, type Property } from "@/store/property-store";
 import { useContratStore, type Contrat } from "@/store/contrat-store";
+import { useStatisticsStore } from "@/store/statistics-store";
 
 function Index() {
     const page = usePage();
@@ -34,12 +35,25 @@ function Index() {
       initializeProperties(initialProperties);
     }, [initialProperties, initializeProperties]);
 
-    const initialContracts = useMemo(() => (page.props.contracts as Contrat[]) || [], [page.props.contracts]);
+    const initialContracts = useMemo(() => (page.props.contrats as Contrat[]) || [], [page.props.contrats]);
     const initializeContracts = useContratStore((state) => state.initializeContrats);
     useEffect(() => {
       initializeContracts(initialContracts);
     }, [initialContracts, initializeContracts]);
-  
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const initialStatistics = useMemo(() => page.props.statistics as any, [page.props.statistics]);
+    const initializeStatistics = useStatisticsStore((state) => state.initializeStatistics);
+    useEffect(() => {
+      initializeStatistics({
+        totalPaid: initialStatistics.total_paid,
+        totalPending: initialStatistics.total_pending,
+        totalLate: initialStatistics.total_late,
+        activeContrats: initialStatistics.active_contrats,
+        occupancyRate: initialStatistics.occupancy_rate
+      });
+    }, [initialStatistics, initializeStatistics]);
+  console.log(page.props.statistics)
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <SectionCards />

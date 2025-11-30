@@ -71,16 +71,27 @@ class ContratService:
         if prop.status != Property.PropertyStatus.AVAILABLE:
             raise ValueError("La propriété n'est pas disponible pour un nouveau contrat.")
 
-        data_to_create = contrat_data.model_dump()
+        from dateutil.relativedelta import relativedelta
+
+        end_date = contrat_data.start_date + relativedelta(months=contrat_data.duration_in_months)
+
+        status = contrat_data.status or Contrat.ContratStatus.DRAFT
+
+        data_to_create = contrat_data.model_dump(exclude={'status', 'duration_in_months'})
         
         contrat = Contrat.objects.create(
-            contrat_number= generate_contrat_number(),
+            contrat_number=generate_contrat_number(),
             workspace=acting_user.workspace,
             property=prop,
             tenant=tenant,
             created_by=acting_user,
+            end_date=end_date,
+            status=status,
             **data_to_create
         )
+
+        if status == Contrat.ContratStatus.ACTIVE:
+            contrat.activate()
         AuditLogService.log_action(
             user=acting_user,
             action=AuditLog.AuditAction.CREATE,
@@ -89,6 +100,10 @@ class ContratService:
             new_values={
                 'property_id': str(data_to_create.pop('property_id')),
                 'tenant_id': str(data_to_create.pop('tenant_id')),
+                'start_date': str(data_to_create.pop('start_date')),
+                'monthly_rent': str(data_to_create.pop('monthly_rent')),
+                'charges': str(data_to_create.pop('charges')),
+                'security_deposit': str(data_to_create.pop('security_deposit')),
                 **data_to_create
                 },
             request=request,
